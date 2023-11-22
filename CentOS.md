@@ -4,7 +4,7 @@
 
 克隆：
 
-![](MD_Picture/Linux%E6%96%87%E4%BB%B6.png)
+![](https://github.com/Future-001/Dairy_Learning/blob/Linux/Linux%E6%96%87%E4%BB%B6.png)
 
 ## **系统分区：**
 
@@ -28,7 +28,7 @@
 
 /dev/sd[a....]    分区中的编号1~4 只能给主分区或者扩展分区使用，即使主分区或扩展分区没有使用到4，在扩展分区中的子分区（逻辑分区）不能使用1~4
 
-![image-20231121153538727](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121153538727.png)
+![image-20231121153538727](MD_Picture/image-20231121153538727.png)
 
 如上图：sdb5,sdb6... 不会将其识别为1~4
 
