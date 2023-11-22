@@ -22,13 +22,13 @@
 >
 > 挂载：给每个分区分配挂载点
 >
-> <img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121152950046.png" alt="image-20231121152950046" style="zoom:33%;" /><img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121153013686.png" alt="image-20231121153013686" style="zoom:33%;" /><img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121153027796.png" alt="image-20231121153027796" style="zoom:33%;" />
+> <img src="https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121152950046.png" alt="image-20231121152950046" style="zoom:33%;" /><img src="https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121153013686.png" alt="image-20231121153013686" style="zoom:33%;" /><img src="https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121153027796.png" alt="image-20231121153027796" style="zoom:33%;" />
 >
 > **IDE接口     								 SCSI    							SATA**
 
 /dev/sd[a....]    分区中的编号1~4 只能给主分区或者扩展分区使用，即使主分区或扩展分区没有使用到4，在扩展分区中的子分区（逻辑分区）不能使用1~4
 
-![image-20231121153538727](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121153538727.png)
+![image-20231121153538727](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121153538727.png)
 
 如上图：sdb5,sdb6... 不会将其识别为1~4
 
@@ -46,7 +46,7 @@
 
 - ​		/boot（启动分区，200MB,免得根分区满了，难以启动)
 
-![image-20231121154452919](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121154452919.png)
+![image-20231121154452919](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121154452919.png)
 
 - [ ] 
 
@@ -60,11 +60,11 @@ swap分区，是没有挂载点的，是给操作系统自己调用的，无法�
 
 ------
 
-![image-20231121160159775](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121160159775.png)
+![image-20231121160159775](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121160159775.png)
 
 做的越多，错的可能更多。================》   稳定和安全
 
-![image-20231121160645140](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121160645140.png)
+![image-20231121160645140](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121160645140.png)
 
 Kickstart.cfg:  记录安装过程，方便大规模的服务器安装
 
@@ -95,7 +95,7 @@ Linux中一切皆文件，那么， ipconfig xxx（给网络起个名字,一般�
 
 桥接有两个 有线&& 无线：可能是 VMware 中虚拟环境配置，需要自动桥接成了无线或有线，选择其中一个。
 
-![image-20231121164028176](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121164028176.png)
+![image-20231121164028176](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121164028176.png)
 
 ### 快速链接工具：
 
@@ -103,9 +103,9 @@ Linux中一切皆文件，那么， ipconfig xxx（给网络起个名字,一般�
 
 有的Linux禁止使用root直接登录，需要利用普通用户登录。
 
-![image-20231121170636915](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121170636915.png)
+![image-20231121170636915](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121170636915.png)
 
-![](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121164814748.png)
+![](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121164814748.png)
 
 ### Winscp:
 
@@ -116,9 +116,9 @@ windows和Linux之间进行文档的拷贝，登录同上方法。
 1. 大小写敏感
 2. 后缀名，Linux不需要后缀名（扩展名），一切皆文件（硬件也是）
 3. 但是自己也可以扩展名（主要让管理员区分)
-4. ![image-20231121212809725](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231121212809725.png)
+4. ![image-20231121212809725](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/image-20231121212809725.png)
 5. Linux的所有存储设备必须挂载后使用（包括硬盘，U盘。。。）
-6. ![](D:\Diary_Learning\Linux\Linux文件.png)
+6. ![](https://github.com/Future-001/Dairy_Learning/blob/Linux/MD_Picture/Linux文件.png)
 
 ### 服务器的注意事项：
 
