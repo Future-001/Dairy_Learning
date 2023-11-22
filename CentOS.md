@@ -4,7 +4,7 @@
 
 克隆：
 
-![](D:\Diary_Learning\Linux\Linux_DAY1.png)
+![](https://github.com/Future-001/Dairy_Learning/blob/Linux/Linux%E6%96%87%E4%BB%B6.png)
 
 ## **系统分区：**
 
