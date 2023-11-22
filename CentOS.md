@@ -4,7 +4,7 @@
 
 克隆：
 
-![](https://github.com/Future-001/Dairy_Learning/blob/Linux/Linux%E6%96%87%E4%BB%B6.png)
+![](MD_Picture/Linux%E6%96%87%E4%BB%B6.png)
 
 ## **系统分区：**
 
@@ -50,7 +50,7 @@
 
 - [ ] 
 
-F2 进步BIOS，以前的需要进行 利用光盘启动。（真实机器 上需要修改一下）
+F2 进入BIOS，以前的需要进行 利用光盘启动。（真实机器 上需要修改一下）
 
 swap分区，是没有挂载点的，是给操作系统自己调用的，无法分配挂载点。（直接就是swap类型）
 
