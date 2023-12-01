@@ -7,7 +7,7 @@
 ![](https://github.com/Future-001/Dairy_Learning/blob/Linux/Linux%E6%96%87%E4%BB%B6.png)
 
 ## **系统分区：**
-
+![](https://github.com/Future-001/Picture/tree/master/Typora/image-20231121152950046.png)
 ------
 
 **Windows：分区，分配盘符，格式化**
