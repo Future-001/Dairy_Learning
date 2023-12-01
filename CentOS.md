@@ -4,7 +4,8 @@
 
 克隆：
 
-![](MD_Picture/Linux文件.png)
+![](Linux文件.png)
+![](Linux_DAY1.png)
 
 ## **系统分区：**
 
