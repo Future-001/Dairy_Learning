@@ -2796,50 +2796,41 @@ tips:			**pstree**是以树结构显示进程(–display a tree of processes)
 
 1. 位置参数变量
 
-​              ![image-20240320170138907](MD_Picture/image-20240320170138907.png)   
+   - 名称是固定的   
 
+   ![image-20240320170138907](MD_Picture/image-20240320170138907.png)   
+
+```
 例子1： 
-
-\#!/bin/bash 
-
+#!/bin/bash 
 num1=$1 
-
 num2=$2 
-
 sum=$(( $num1 + $num2)) 
-
-\#变量sum的和是num1加num2 
-
+#变量sum的和是num1加num2,要进行数学运算，格式必须是 $(())
 echo $sum 
+#打印变量sum的值
+```
 
-\#打印变量sum的值
 
 
-
+```
 例子2： 
-
-\#!/bin/bash 
-
+#!/bin/bash 
 echo "A total of $# parameters" 
-
-\#使用$#代表所有参数的个数 
-
+#使用$#代表所有参数的个数 
 echo "The parameters is: $*" 
-
-\#使用$*代表所有的参数 
-
+#使用$*代表所有的参数 
 echo "The parameters is: $@" 
-
-\#使用$@也代表所有参数
+#使用$@也代表所有参数
+```
 
 ​            ![image-20240320170212938](MD_Picture/image-20240320170212938.png)
 
-例子3：$*与$@的区别 
-
 ```
+例子3：$*与$@的区别 ：
 #!/bin/bash 
 for i in "$*" 
-#$*中的所有参数看成是一个整体，所以这个for循环只会循环一次         
+#$*中的所有参数看成是一个整体，所以这个for循环只会循环一次  （“$*必须要双引括起来，不然就会被分开)  
 do                 
 echo "The parameters is: $i"         
 done 
@@ -2852,13 +2843,16 @@ x=$(( $x +1 ))
 done
 ```
 
-
-
 #### **10.4.4 预定义变量**
 
-1. 预定义变量
+1. **预定义变量**
 
-​              ![image-20240320170237990](MD_Picture/image-20240320170237990.png)
+![image-20240320170237990](MD_Picture/image-20240320170237990.png)
+
+```
+echo $?  
+#判断了上一条命令是否正确执行 ，想想管道符  &&  || 
+```
 
 ```
 #/bin/bash
@@ -2872,23 +2866,20 @@ find /root -name hello.sh &
 echo "The last one Daemon process is $!"
 ```
 
-1. 接收键盘输入 
+2. **接收键盘输入** 
 
-[root@localhost ~]# read [选项] [变量名] 
-
-选项：  
-
--p “提示信息”：在等待read输入时，输出提示信息  
-
--t 秒数：  read命令会一直等待用户输入，使用此选项可以指定等待时间  
-
--n 字符数： read命令只接受指定的字符数，就会 执行  
-
--s：   隐藏输入的数据，适用于机密信息的输入  
-
-
-
-
+> [root@localhost ~]# read [选项] [变量名] 
+>
+> 选项：  
+>
+> ​				-p “提示信息”：在等待read输入时，输出提示信息  
+>
+> ​				-t 秒数：  read命令会一直等待用户输入，使用此选项可以指定等待时间  (默认30s)
+>
+> ​				-n 字符数： read命令只接受指定的字符数，输入几个字符就会 执行，不用等回车  
+>
+> ​				-s：   隐藏输入的数据，适用于机密信息的输入  
+>
 
 ```
 #!/bin/bash 
@@ -2906,65 +2897,61 @@ echo -e "\n"
 echo "Sex is $gender"
 ```
 
+## **10.5 Bash的运算符**
+
+#### **10.5.1 数值运算与运算符**
+
+1. **declare声明变量类型** 
+
+​						[root@localhost ~]# declare [+/- ]   [选项] 变量名 
+
+​								选项：  
+
+​											 -：  给变量设定类型属性  
+
+ 											 +:  取消变量的类型属性  
+
+​											 -i:  将变量声明为整数型（integer）  
+
+​											-x: 将变量声明为环境变量  类似于 export 属性
+
+​											-p:  显示指定变量的被声明的类型 
+
+2. **数值运算**
+
+​		**方法1 :**
+
+​							[root@localhost ~]# aa=11 
+
+​							[root@localhost ~]# bb=22 #给变量aa和bb赋值
+
+​							[root@localhost ~]# declare -i cc=$aa+$bb
+
+​						**方法2：expr或let数值运算工具** 
+
+​											[root@localhost ~]# aa=11 
+
+​											[root@localhost ~]# bb=22 
+
+​											#给变量aa和变量bb赋值 
+
+​											[root@localhost ~]# dd=$(expr $aa + $bb) 
+
+​											#dd的值是aa和bb的和。注意“+”号左右两侧必须有空格  
+
+​				**方法3：“$((运算式))”或“$[运算式]”** (推荐)
+
+​										[root@localhost ~]# aa=11 
+
+​										[root@localhost ~]# bb=22 
+
+​										[root@localhost ~]# ff=$(( $aa+$bb )) 
+
+​										[root@localhost ~]# gg=$[ $aa+$bb ]
 
 
 
-
-#### **10.5 Bash的运算符**
-
-##### **10.5.1 数值运算与运算符**
-
-1. declare声明变量类型 
-
-[root@localhost ~]# declare [+/-][选项] 变量名 
-
-选项：  
-
- -：  给变量设定类型属性  
-
-  +:  取消变量的类型属性  
-
- -i:  将变量声明为整数型（integer）  
-
--x: 将变量声明为环境变量  
-
--p:  显示指定变量的被声明的类型 
-
-1. 数值运算
-
-方法1 :
-
-[root@localhost ~]# aa=11 
-
-[root@localhost ~]# bb=22 #给变量aa和bb赋值
-
-[root@localhost ~]# declare -i cc=$aa+$bb
-
-**方法2：expr或let数值运算工具** 
-
-[root@localhost ~]# aa=11 
-
-[root@localhost ~]# bb=22 
-
-\#给变量aa和变量bb赋值 
-
-[root@localhost ~]# dd=$(expr $aa + $bb) 
-
-\#dd的值是aa和bb的和。注意“+”号左右两侧必须有空格  
-
-**方法3：“$((运算式))”或“$[运算式]”** (推荐)
-
-[root@localhost ~]# aa=11 
-
-[root@localhost ~]# bb=22 
-
-[root@localhost ~]# ff=$(( $aa+$bb )) 
-
-[root@localhost ~]# gg=$[ $aa+$bb ]
-
-
-
-1. 运算符
+3. **运算符**
 
 ​                ![image-20240320170305588](MD_Picture/image-20240320170305588.png)
 
@@ -2979,24 +2966,18 @@ echo "Sex is $gender"
 #逻辑与运算只有想与的两边都是1，与的结果才是1，否则与的结果是0
 ```
 
-
-
-##### **10.5.2 变量测试与内容替换**
+#### **10.5.2 变量测试与内容替换**
 
 ​                ![image-20240320170331102](MD_Picture/image-20240320170331102.png)
 
 例子1：测试x = $ { y - 新值} 
-
-
-
-
 
 ```
 [root@localhost ~]# unset y 
 #删除变量y 
 [root@localhost ~]# x=${y-new} 
 #进行测试 
-[root@localhost ~]# echo $x new 
+[root@localhost ~]# echo $x
 #因为变量y不存在，所以x=new  
 [root@localhost ~]# y="" 
 #给变量y赋值为空 
@@ -3012,30 +2993,27 @@ old
 
 
 
+## **10.6 环境变量配置文件**
 
+#### **10.6.1 环境变量配置文件简介**
 
-#### **10.6 环境变量配置文件**
+1. **source命令** 
 
-##### **10.6.1 环境变量配置文件简介**
+​							[root@localhost ~]# source 配置文件    或           [root@localhost ~]# . 配置文件  
 
-1. source命令 
+​				**1. 环境变量配置文件简介** 
 
-[root@localhost ~]# source 配置文件 
+> - 环境变量配置文件中主要是定义对系统的操作环境生效的系统默认环境变量，比如PATH、HISTSIZE、PS1、HOSTNAME等默认环境变量。
+> - /etc/profile 
+> - /etc/profile.d/*.sh 
+> - ~/.bash_profile 
+> - ~/.bashrc 
+> - /etc/bashrc
+>   - etc下的这几个文件对所有用户都生效，但是 ~代表家目录。 . 代表隐藏文件，只在特定用户下生效
+>
+>
 
-或 
-
-[root@localhost ~]# . 配置文件  
-
-1. 环境变量配置文件简介 
-
-- 环境变量配置文件中主要是定义对系统的操作环境生效的系统默认环境变量，比如PATH、HISTSIZE、PS1、HOSTNAME等默认环境变量。
-- /etc/profile 
-- /etc/profile.d/*.sh 
-- ~/.bash_profile 
-- ~/.bashrc 
-- /etc/bashrc
-
-##### **10.6.2 环境变量配置文件作用**
+#### **10.6.2 环境变量配置文件作用**
 
 - /etc/profile 
 - /etc/profile.d/*.sh 
@@ -3043,71 +3021,88 @@ old
 - ~/.bashrc 
 - /etc/bashrc
 
+```
 tips:/etc 目录下的对所有用户都生效
-
 ~/.bash_profile 和 ~/.bashrc -> 每个用户自己的配置文件，只对用户生效。
-
-
+```
 
 下图为配置文件读取顺序：
 
 ​                 ![image-20240320170353948](MD_Picture/image-20240320170353948.png)
 
-上图从左到右如果没有叠加。后面的命令会覆盖前面的命令。
+上图从左到右如果**没有叠加**。后面的命令会覆盖前面的命令。
 
-/etc/profile的作用： 
+​			**/etc/profile的作用：** 
 
-- USER变量： 
-- LOGNAME变量： 
-- MAIL变量： 
-- PATH变量： 
-- HOSTNAME变量： 
-- HISTSIZE变量： 
-- umask： 
-- 调用/etc/profile.d/*.sh文件  
+> - USER变量： 
+> - LOGNAME变量： 
+> - MAIL变量： 
+> - PATH变量： 
+> - HOSTNAME变量： 
+> - HISTSIZE变量： 
+> - umask： 
+> - 调用/etc/profile.d/*.sh文件  
+>
 
-~/.bash_profile的作用 
+**~/.bash_profile的作用** 
 
 - 用了~/.bashrc文件。 
-
 - 在PATH变量后面加入了“:$HOME/bin”这个目录
 
-##### **10.6.3 其他配置文件和登录信息**
+**~/bsahrc 目录的作用**
 
-1. 注销时生效的环境变量配置文件 
+- 保存系统别名
 
-- ~/.bash_logout  
+**~/etc/bashrc的作用：**
 
-1. 其他配置文件
+- PS1变量
+- umask
+- PATH变量
+- 调用/etc/profile.d/*.sh文件
+  - 看起来是不是和第一个重复了呢？但是有备注：这是一个**不需要登录**的 shell环境配置
 
-- ~/bash_history
+#### **10.6.3 其他配置文件和登录信息**
 
-1. Shell登录信息 
+1. **注销时生效的环境变量配置文件** 
+   - ~/.bash_logout  
 
-- 本地终端欢迎信息： /etc/issue
+
+2. **其他配置文件**
+   - ~/bash_history
+
+
+3. **Shell登录信息** 
+   - 本地终端欢迎信息： /etc/issue
+     - Linux 支持 六个终端切换， alt + F1-6 ,但是你很难分辨哪一个是哪一个。建议在/etc/issue中加上一个 -l  只对本地用户生效
+
 
 ​                 ![image-20240320170414134](MD_Picture/image-20240320170414134.png)        
 
-- 远程终端欢迎信息： /etc/issue.net 
+- **远程终端欢迎信息： /etc/issue.net** 
 
-- - 转义符在/etc/issue.net文件中不能使用 
-  - 是否显示此欢迎信息，由ssh的配置文件/etc/ssh/sshd_config决定，加入“Banner /etc/issue.net”行才能显示（记得重启SSH服务）   
+  - 转义符在/etc/issue.net文件中不能使用 
 
-- 登陆后欢迎信息：/etc/motd 
+  - 是否显示此欢迎信息，由ssh的配置文件/etc/ssh/sshd_config决定，加入“Banner /etc/issue.net”行才能显示，在最后一行左右（记得重启SSH服务  保存退出 service  sshd restart）   
 
-不管是本地登录，还是远程登录，都可以显示此欢迎信息
+    
+
+- **登陆后欢迎信息：/etc/motd** 
+  - 登陆后显示
+  - 不管是本地登录，还是远程登录，都可以显示此欢迎信息
+
+
 
 # **第十一章 Shell编程**
 
-#### **11.1 基础正则表达式**
+## **11.1 基础正则表达式**
 
-1. 正则表达式与通配符 
+1. **正则表达式与通配符** 
 
-- 正则表达式用来在文件中匹配符合条件的字符串，正则是包含匹配。grep、awk、sed等命令可以支持正则表达式。 
+- 正则表达式用来在文件中匹配符合条件的**字符串**，正则是**包含匹配**。grep、awk、sed等命令可以支持正则表达式。 
 
-- 通配符用来匹配符合条件的文件名，通配符是完全匹配。ls、find、cp这些命令不支持正则表达式，所以只能使用shell自己的通配符来进行匹配了。
+- 通配符用来匹配符合条件的**文件名**，通配符是**完全匹配**。ls、find、cp这些命令不支持正则表达式，所以只能使用shell自己的通配符来进行匹配了。
 
-2、基础正则表达式
+​		**2. 基础正则表达式**
 
 ​             ![image-20240320170454683](MD_Picture/image-20240320170454683.png)    
 
@@ -3115,19 +3110,19 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "a*" test_rule.txt  
 
-\#匹配所有内容，包括空白行
+​						#匹配所有内容，包括空白行,因为*表示出现0次或任意多次
 
 - grep "aa*" test_rule.txt 
 
-\#匹配至少包含有一个a的行 
+ 					#匹配至少包含有一个a的行 
 
 - grep "aaa*" test_rule.txt  
 
-\#匹配最少包含两个连续a的字符串 
+​					#匹配最少包含两个连续a的字符串 
 
 - grep "aaaaa*" test_rule.txt 
 
-\#则会匹配最少包含四个个连续a的字符串
+​	  			#则会匹配最少包含四个个连续a的字符串
 
 
 
@@ -3135,15 +3130,15 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep  "s..d" test_rule.txt  
 
-\#“s..d”会匹配在s和d这两个字母之间一定有两个字符的单词 
+​						#“s..d”会匹配在s和d这两个字母之间一定有两个字符的单词 
 
 - grep "s.*d" test_rule.txt  
 
-\#匹配在s和d字母之间有任意字符 
+​						#匹配在s和d字母之间有任意字符 
 
 - grep ".*" test_rule.txt  
 
-\#匹配所有内容
+​						#匹配所有内容
 
 
 
@@ -3151,15 +3146,15 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "^M" test_rule.txt 
 
-\#匹配以大写“M”开头的行 
+​						#匹配以大写“M”开头的行 
 
 - grep "n$" test_rule.txt 
 
-\#匹配以小写“n”结尾的行 
+​						#匹配以小写“n”结尾的行 
 
 - grep -n "^$" test_rule.txt 
 
-\#会匹配空白行 
+​						#会匹配空白行 
 
 
 
@@ -3167,15 +3162,15 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "s[ao]id" test_rule.txt
 
-\#匹配s和i字母中，要不是a、要不是o 
+​									#匹配s和i字母中，要不是a、要不是o 
 
 - grep "[0-9]" test_rule.txt
 
-\#匹配任意一个数字 
+​									#匹配任意一个数字 
 
 - grep "^[a-z]" test_rule.txt 
 
-\#匹配用小写字母开头的行
+​								#匹配用小写字母开头的行
 
 
 
@@ -3183,15 +3178,15 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "^[â-z]" test_rule.txt  
 
-\#匹配不用小写字母开头的行 
+​							#匹配不用小写字母开头的行 
 
 - grep "^[â-zA-Z]" test_rule.txt 
 
-\#匹配不用字母开头的行 “\” 转义符 
+​							#匹配不用字母开头的行 “\” 转义符 
 
 - grep "\.$" test_rule.txt
 
-\#匹配使用“.”结尾的行
+​							#匹配使用“.”结尾的行
 
 
 
@@ -3199,11 +3194,11 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "a\{3\}" test_rule.txt 
 
-\#匹配a字母连续出现三次的字符串 
+​								#匹配a字母连续出现三次的字符串 
 
 - grep "[0-9]\{3\}" test_rule.txt 
 
-\#匹配包含连续的三个数字的字符串   
+​							#匹配包含连续的三个数字的字符串   
 
 
 
@@ -3211,7 +3206,7 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "^[0-9]\{3,\}[a-z]" test_rule.txt 
 
-\#匹配最少用连续三个数字开头的行
+​						#匹配最少用连续三个数字开头的行
 
 
 
@@ -3219,99 +3214,92 @@ tips:/etc 目录下的对所有用户都生效
 
 - grep "sa\{1,3\}i" test_rule.txt 
 
-\#匹配在字母s和字母i之间有最少一个a，最多三个a
+​							#匹配在字母s和字母i之间有最少一个a，最多三个a
 
 
 
-#### **11.2 字符截取命令**
+## **11.2 字符截取命令**
 
-##### **11.2.1  cut字段提取命令**
+#### **11.2.1  cut字段提取命令**
 
-[root@localhost ~]# cut [选项] 文件名 
+**[root@localhost ~]# cut [选项] 文件名** 
 
-选项：  
+​				提取符合条件的列，注意和 管道符 | 以及 grep 配合使用 
 
--f  列号：  	   提取第几列  
+​				选项：  
 
--d 分隔符：  按照指定分隔符分割列
+​							-f  列号：  	   提取第几列  
 
+​							-d 分隔符：  按照指定分隔符分割列
 
-
+```
 [root@localhost ~]# vi student.txt 
-
 ID      Name    gender  Mark 
-
 1        Liming  M         86 
-
 2        Sc          M         90 
-
 3        Gao        M         83  
-
-
-
+# 中间是制表符：不是空格，不然不能正确提取
 [root@localhost ~]# cut -f 2 student.txt  
-
-\#提取第二列
-
+#提取第二列
 [root@localhost ~]# cut -f 2,3 student.txt  
-
-\#提取第二第三列
-
+#提取第二第三列
 [root@localhost ~]# cut -d ":" -f 1,3 /etc/passwd
+#以：为分隔符提取第一第三列 默认使用制表符
+```
 
-\#以：为分隔符提取第一第三列
-
-
-
-cut命令的局限 
-
-[root@localhost ~]# df -h | cut -d " " -f 1,3
-
-\#有空格时提取会出问题
-
-
-
-##### **11.2.2  printf命令**
-
-[root@localhost ~]# printf   ’输出类型输出格式’    输出内容 
-
-输出类型：  
-
-%ns ：  输出字符串。n是数字指代输出几个字符  
-
-%ni ：  输出整数。n是数字指代输出几个数字  
-
-%m.nf ： 输出浮点数。m和n是数字，指代输出的整数   位数和小数位数。如%8.2f代表共输出8位数，   其中2位是小数，6位是整数。 
+> cut命令的局限 
+>
+> [root@localhost ~]# df -h | cut -d " " -f 1,3
+>
+> \#有空格时提取会出问题
+>
 
 
 
-输出格式：  
+#### **11.2.2  printf命令**
 
-\a :    输出警告声音  
+> **[root@localhost ~]# printf   ’输出类型输出格式’    输出内容** 
+>
+> ​				常用于 awk字符列提取命令中的标准输出格式
+>
+> ​						输出类型：  
+>
+> ​									%ns ：  输出字符串。n是数字指代输出几个字符  
+>
+> ​									%ni ：  输出整数。n是数字指代输出几个数字  
+>
+> ​									%m.nf ： 输出浮点数。m和n是数字，指代输出的整数   位数和小数位数。如%8.2f代表共输出8位数，   其中2位是小数，6位是整数。 
+>
+> 
+>
+> ​					输出格式：  
+>
+> ​									\a :    输出警告声音  
+>
+> ​									\b :    输出退格键，也就是Backspace键 
+>
+> ​									\f :    清除屏幕  
+>
+> ​									\n :    换行  
+>
+> ​									\r :    回车，也就是Enter键  
+>
+> ​									\t :    水平输出退格键，也就是Tab键  
+>
+> ​									\v :    垂直输出退格键，也就是Tab键
+>
 
-\b :    输出退格键，也就是Backspace键 
-
-\f :    清除屏幕  
-
-\n :    换行  
-
-\r :    回车，也就是Enter键  
-
-\t :    水平输出退格键，也就是Tab键  
-
-\v :    垂直输出退格键，也就是Tab键
 
 
-
+```
 [root@localhost ~]# printf %s 1 2 3 4 5 6  
-
-[root@localhost ~]# printf %s %s %s 1 2 3 4 5 6  
-
+[root@localhost ~]# printf %s %s %s 1 2 3 4 5 6 
+						# 这样只会识别出第一个 %S , 后面的 %s 会被当成字符串输出
 [root@localhost ~]# printf  '%s %s %s' 1 2 3 4 5 6  
-
+						# 只有添加了单引号，才起作用，才能匹配上
 [root@localhost ~]# printf '%s %s %s\n' 1 2 3 4 5 6 
-
-tips:printf  '%s %s %s\n' 1 2 3 4 5 6 
+tips:printf  '%s %s %s\n' 1 2 3 4 5 6    控制了输出格式
+```
 
 三个看成一个整体所以123是一个整体，456是另一个。所以在3后面换行
 
@@ -3319,38 +3307,33 @@ tips:printf  '%s %s %s\n' 1 2 3 4 5 6
 
 
 
+```
+[root@localhost ~]# printf '%s' student.txt  系统不认识，会将其当成字符串直接输出
+[root@localhost ~]# printf %s $(cat student.txt)
 [root@localhost ~]# vi student.txt  
-
 ID      Name      PHP     Linux   MySQL   Average 
-
 1       Liming     82         95         86            87.66 
-
 2       Sc             74         96         87            85.66 
-
 3       Gao           99         83         93           91.66
+```
 
-
-
+```
 printf  '%s' $(cat student.txt) 
-
-\#不调整输出格式  
-
-
-
+#不调整输出格式  
 printf '%s\t %s\t %s\t %s\t %s\t %s\t \n' $(cat student.txt) 
+#调整格式输出 
+```
 
-\#调整格式输出 
 
 
+**在awk命令的输出中支持print和printf命令** 
 
-在awk命令的输出中支持print和printf命令 
-
-- print：print会在每个输出之后自动加入一个换行符（Linux默认没有print命
+- print：print会在每个输出之后自动加入一个换行符（Linux默认没有print命令）
 - printf：printf是标准格式输出命令，并不会自动加入换行符，如果需要换行，需要手工加入换行符
 
 
 
-##### **11.2.3  awk命令**
+#### **11.2.3  awk命令**
 
 [root@localhost ~]# awk ‘条件1{动作1} 条件2{动作2}…’ 文件名 
 
@@ -3420,7 +3403,7 @@ ID      Name      PHP     Linux   MySQL   Average
 
 
 
-##### **11.2.4  sed命令**
+#### **11.2.4  sed命令**
 
 **sed命令** 
 
@@ -3528,7 +3511,7 @@ ID      Name      PHP     Linux   MySQL   Average
 
 
 
-#### **11.3 字符处理命令**
+## **11.3 字符处理命令**
 
 1. 排序命令sort  
 
@@ -3582,7 +3565,7 @@ ID      Name      PHP     Linux   MySQL   Average
 
 -m： 只统计字符数
 
-#### **11.4 条件判断**
+## **11.4 条件判断**
 
 1. **按照文件类型进行判断**
 
@@ -3698,7 +3681,7 @@ aa=24
 
 [ -n "$aa"  -a "$aa" -gt 23 ] && echo "yes" || echo "no" yes
 
-#### **11.5 流程控制**
+## **11.5 流程控制**
 
 ##### **11.5.1  if语句**
 
@@ -4152,7 +4135,7 @@ echo"Thesumis:$s"
 
 
 
-#### **11.6 函数**
+## **11.6 函数**
 
 语法：
 
@@ -4223,7 +4206,7 @@ echo "输入的两个数字之和为 $? !"
 
 
 
-### **第十二讲 Linux服务管理**
+# **第十二讲 Linux服务管理**
 
 #### **12.1  服务简介与分类**
 
