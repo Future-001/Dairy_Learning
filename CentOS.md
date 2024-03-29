@@ -3335,71 +3335,81 @@ printf '%s\t %s\t %s\t %s\t %s\t %s\t \n' $(cat student.txt)
 
 #### **11.2.3  awk命令**
 
-[root@localhost ~]# awk ‘条件1{动作1} 条件2{动作2}…’ 文件名 
-
-条件（Pattern）：  
-
-一般使用关系表达式作为条件  
-
-x > 10 判断变量 x是否大于10  
-
-x>=10 大于等于 
-
-x<=10 小于等于 
-
-动作（Action）：  
-
-格式化输出  
-
-流程控制语句   
+> **重提cut命令**；不能使用 空格 作为分隔符，不然中间的空白都认为是空格，每一个空格都是一个字符，那么最后							提取出来的内容就是空格
+>
+> **awk命令：**cut能做的都能做，同时比cut强大。默认使用空格或制表符作为分隔符。
+>
+> **为什么还有cut命令？**awk比较复杂，不光可以实现字符段的截取，还可以实现编程调用，自定义函数，判断，流程控制等功能
 
 
 
+> [root@localhost ~]# **awk ‘条件1{动作1} 条件2{动作2}…’ 文件名** 
+>
+> ​								**条件（Pattern）：**  
+>
+> ​														一般使用关系表达式作为条件  
+>
+> ​														x > 10 判断变量 x是否大于10  
+>
+> ​														x>=10 大于等于 
+>
+> ​														x<=10 小于等于 
+>
+> ​							**动作（Action）：**  
+>
+> ​													格式化输出  
+>
+> ​													流程控制语句   
+>
+
+
+
+```
 [root@localhost ~]# vi student.txt  
-
 ID      Name      PHP     Linux   MySQL   Average 
-
 1        Liming    82        95         86             87.66 
-
 2        Sc            74        96         87             85.66 
-
 3        Gao          99        83        93              91.66
 
-
-
 [root@localhost ~]#awk '{printf $2 "\t" $6 "\n"}' student.txt   
-
 [root@localhost ~]# df -h | awk '{print $1 "\t" $3}'    
+​		无论什么条件都执行括号内的动作，系统中是没有print命令的，但是在awk中都能使用，区别printf不会自动加入换行符，print自动加入了换行符。
+```
 
 ​                 ![image-20240320170550142](MD_Picture/image-20240320170550142.png) 
 
-提取已用百分比
+**提取已用百分比**
 
-​          ![image-20240320170610529](MD_Picture/image-20240320170610529.png)       
+![image-20240320170610529](MD_Picture/image-20240320170610529.png)       
 
-**BEGIN** 
+**BEGIN命令** 
 
-\#awk 'BEGIN{printf "This is a transcript \n" }  {printf $2 "\t" $6 "\n"}' student.txt
-
-
+```
+#awk 'BEGIN{printf "This is a transcript \n" }  {printf $2 "\t" $6 "\n"}' student.txt
+begin 是一个条件，在所有的数据读取之前执行该命令， 后一句： 只要有数据就输出
+```
 
 **END** 
 
-\# awk 'END{printf "The End \n" }                             
-
-{printf $2 "\t" $6 "\n"}' student.txt  
-
-
+```
+# awk 'END{printf "The End \n" } {printf $2 "\t" $6 "\n"}' student.txt
+在最后一行加入字符
+```
 
 **FS内置变量** 
 
-\#cat /etc/passwd | grep "/bin/bash" | awk 'BEGIN {FS=":"} {printf $1 "\t" $3 "\n"}'
+```
+功能：指定分隔符，注意观察下图：第一行没有处理，为什么呢？awk处理是先读入第一行数据，然后再进行处理。所以在指定分隔符之前，数据已经读入，第一行使用了默认的分隔符进行分割。 ====> 在分隔符之前写入分割符，BEGIN。
+#cat /etc/passwd | grep "/bin/bash" | awk 'BEGIN {FS=":"} {printf $1 "\t" $3 "\n"}'
+```
 
-
+![image-20240328230946100](MD_Picture/image-20240328230946100.png)
 
 **关系运算符** 
 
-\#cat student.txt | grep -v Name |  awk '$6 >= 87 {printf $2 "\n" }'
+```
+#cat student.txt | grep -v Name |  awk '$6 >= 87 {printf $2 "\n" }'
+```
 
 
 
@@ -3409,221 +3419,203 @@ ID      Name      PHP     Linux   MySQL   Average
 
 - sed 是一种几乎包括在所有 UNIX 平台（包括 Linux）的轻量级流编辑器。sed主要是用来将数据进行选取、替换、删除、新增的命令。
 
- 
-
-[root@localhost ~]# sed [选项] ‘[动作]’ 文件名 
-
-选项：  
-
--n：  一般sed命令会把所有数据都输出到屏幕 ，  如果加入此选择，则只会把经过           		sed命令处  理的行输出到屏幕。 
-
- -e： 允许对输入数据应用多条sed命令编辑 
-
- -i：  用sed的修改结果直接修改读取数据的文件，  而不是由屏幕输出
-
-
-
-动作：  
-
-a \：  追加，在当前行后添加一行或多行。添加多行时，除最后 一行  外，每行末尾需要用“\”代	     		表数据未完结。 
-
-c \：  行替换，用c后面的字符串替换原数据行，替换多行时，除最  后一行外，每行末尾需“\”代   		表数据未完结。
-
-​      i \：  插入，在当期行前插入一行或多行。插入多行时，除最后 一行  外，每行末尾需要“\”代
-
-表数据未完结。 
-
-d：  删除，删除指定的行。 
-
-​      p：  打印，输出指定的行。 
-
-​      s：  字串替换，用一个字符串替换另外一个字符串。格式为“行范  围s/旧字串/新字串/g”（和vim
-
-中的替换格式类似）。 
+> [root@localhost ~]# **sed [选项] ‘[动作]’ 文件名** 
+>
+> **选项：**  
+>
+> ​						-n：  一般sed命令会把所有数据都输出到屏幕 ，  如果加入此选择，则只会把经过sed命令处 理的行输出到屏幕。 
+>
+> ​						 -e： 允许对输入数据应用多条sed命令编辑 
+>
+>  						-i：  用sed的修改结果直接修改读取数据的文件，  而不是由屏幕输出
+>
+> **动作：**  
+>
+> ​						a \：  追加，在当前行后添加一行或多行。添加多行时，除最后 一行  外，每行末尾需要用“\”代	     		表数据未完结。 
+>
+> ​						c \：  行替换，用c后面的字符串替换原数据行，替换多行时，除最  后一行外，每行末尾需“\”代   		表数据未完结。
+>
+> ​     				 i \：  插入，在当期行前插入一行或多行。插入多行时，除最后 一行  外，每行末尾需要“\”代
+>
+> 表数据未完结。 
+>
+> ​					d：  删除，删除指定的行。 
+>
+> ​      			p：  打印，输出指定的行。 
+>
+> ​     			 s：  字串替换，用一个字符串替换另外一个字符串。格式为“行范  围s/旧字串/新字串/g”（和vim
+>
+> 中的替换格式类似）。 
+>
 
 
 
+```
 学生成绩表 
-
 [root@localhost ~]# vi student.txt  
-
 ID      Name      PHP     Linux   MySQL   Average 
+1       Liming    82      95      86      87.66 
+2       Sc        74      96      87      85.66 
+3       Gao       99      83      93      91.66
+```
 
-1        Liming    82        95         86             87.66 
-
-2        Sc            74        96         87             85.66 
-
-3        Gao         99        83         93             91.66
-
-
-
-**行数据操作** 
-
+```
+行数据操作** 
 [root@localhost ~]# sed '2p' student.txt  
-
-\#查看文件的第二行  
-
+#查看文件的第二行  
 [root@localhost ~]# sed -n '2p' student.txt    
-
 [root@localhost ~]# sed '2,4d' student.txt  
-
-\#删除第二行到第四行的数据，但不修改文件本身
+#删除第二行到第四行的数据，但不修改文件本身
+```
 
 ​              ![image-20240320170639190](MD_Picture/image-20240320170639190.png)
 
 ​               ![image-20240320170712760](MD_Picture/image-20240320170712760.png)
 
-
-
+```
 [root@localhost ~]# sed '2a hello' student.txt   
-
-\#在第二行后追加hello  
-
+#在第二行后追加hello  
 [root@localhost ~]# sed '2i hello \ world' student.txt 
-
-\#在第二行前插入两行数据  
-
-\# sed '2c No such person‘ student.txt 
-
-\#数据替换
-
-
+#在第二行前插入两行数据  
+# sed '2c No such person‘ student.txt 
+#数据替换
 
 **字符串替换** 
 
-\# sed ‘s/旧字串/新字串/g’ 文件名  
+# sed ‘s/旧字串/新字串/g’ 文件名  
+# sed '3s/74/99/g' student.txt  
+#在第三行中，把74换成99 
+#sed -i '3s/74/99/g' student.txt  
+#sed操作的数据直接写入文件  
 
 
-
-\# sed '3s/74/99/g' student.txt  
-
-\#在第三行中，把74换成99 
-
-\#sed -i '3s/74/99/g' student.txt  
-
-\#sed操作的数据直接写入文件  
-
-
-
-\# sed -e 's/Liming//g ; s/Gao//g' student.txt  
-
-\#同时把“Liming”和“Gao”替换为空
+# sed -e 's/Liming//g ; s/Gao//g' student.txt  
+#同时把“Liming”和“Gao”替换为空
+```
 
 
 
 ## **11.3 字符处理命令**
 
-1. 排序命令sort  
+1. **排序命令sort**  
 
-[root@localhost ~]# sort [选项] 文件名 
+> [root@localhost ~]# **sort [选项] 文件名** 
+>
+> **选项：** 
+>
+> ​				-f：  忽略大小写  
+>
+> ​				-n：  以数值型进行排序，默认使用字符串型排序  
+>
+> ​				-r：  反向排序  
+>
+> ​				-t：  指定分隔符，默认是分隔符是制表符  
+>
+> ​				-k n[,m]： 按照指定的字段范围排序。从第n字段开始，  m字段结束（默认到行尾）  
 
-选项： 
-
--f：  忽略大小写  
-
--n：  以数值型进行排序，默认使用字符串型排序  
-
--r：  反向排序  
-
--t：  指定分隔符，默认是分隔符是制表符  
-
--k n[,m]： 按照指定的字段范围排序。从第n字段开始，  m字段结束（默认到行尾）  
 
 
-
+```
 [root@localhost ~]# sort /etc/passwd 
-
-\#排序用户信息文件  
-
+#排序用户信息文件  
 
 
 [root@localhost ~]# sort -r /etc/passwd 
-
-\#反向排序
-
+#反向排序
 
 
 [root@localhost ~]# sort -t ":" -k 3,3 /etc/passwd 
-
-\#指定分隔符是“：”，用第三字段开头，第三字段结尾排序，就是只用第三字段排序  
-
+#指定分隔符是“：”，用第三字段开头，第三字段结尾排序，就是只用第三字段排序  
 
 
-[root@localhost ~]# sort -n -t ":" -k 3,3 /etc/passwd  
+[root@localhost ~]# sort -n -t ":" -k 3,3 /etc/passwd 
+提取出来的字符串当成数值对待 -n
+```
 
 
 
-1. 统计命令wc 
+2. **统计命令wc** 
 
-[root@localhost ~]# wc [选项] 文件名 
+> [root@localhost ~]# **wc [选项] 文件名** 
+>
+> **选项：**  
+>
+> ​			-l： 只统计行数  
+>
+> ​			-w： 只统计单词数  
+>
+> ​			-m： 只统计字符数
 
-选项：  
 
--l： 只统计行数  
-
--w： 只统计单词数  
-
--m： 只统计字符数
 
 ## **11.4 条件判断**
 
-1. **按照文件类型进行判断**
+
+
+**1、按照文件类型进行判断**
 
 ​                ![image-20240320170742293](MD_Picture/image-20240320170742293.png)
 
 
 
-两种判断格式 
-
-[root@localhost ~]# test -e /root/install.log   
-
-[root@localhost ~]# [ -e /root/install.log ] 
-
-[ -d /root ] && echo "yes" || echo "no"  
-
-\#第一个判断命令如果正确执行，则打印“yes”，否则打印“no”
+> **两种判断格式** 
+>
+> [root@localhost ~]# **test -e** /root/install.log   
+>
+> [root@localhost ~]# **[ -e /root/install.log ]** 
+>
+> ​						中括号前后一定有空格
+>
+> **[ -d /root ] && echo "yes" || echo "no"**  
+>
+> ​					 #第一个判断命令如果正确执行，则打印“yes”，否则打印“no”
+>
 
 ​           ![image-20240320170800339](MD_Picture/image-20240320170800339.png)      
 
 
 
-1. **按照文件权限进行判断**
+**2、按照文件权限进行判断****
 
 ​            ![image-20240320170826519](MD_Picture/image-20240320170826519.png)
 
 
 
+```
 [ -w student.txt ] && echo "yes" || echo "no"                   
+#判断文件是拥有写权限的，不能判断是那个身份
+```
 
-\#判断文件是拥有写权限的
-
-1. **两个文件之间进行比较**
+**3、两个文件之间进行比较**
 
 ​            ![image-20240320170849693](MD_Picture/image-20240320170849693.png)
 
 
 
+```
 ln /root/student.txt /tmp/stu.txt 
-
-\#创建个硬链接吧 
+#创建个硬链接吧 
 
 [ /root/student.txt -ef /tmp/stu.txt ] && echo "yes" || echo "no" yes 
+#用test测试下，判断两个文件是否一样，ll -i 人眼观察， 计算机判断通过 ln 判断果然很有用
+```
 
-\#用test测试下，果然很有用
 
-1. **两个整数之间比较**
+
+**4、两个整数之间比较**
 
 ​                ![image-20240320170940353](MD_Picture/image-20240320170940353.png)
 
 
 
+```
+注意是整数，不是字符串
 [ 23 -ge 22 ] && echo "yes" || echo "no"                                   yes 
-
-\#判断23是否大于等于22，当然是了  
+#判断23是否大于等于22，当然是了  
 
 [ 23 -le 22 ] && echo "yes" || echo "no"  no 
-
-\#判断23是否小于等于22，当然不是了
+#判断23是否小于等于22，当然不是了
+```
 
 
 
@@ -3633,29 +3625,22 @@ ln /root/student.txt /tmp/stu.txt
 
 
 
+```
 name=sc 
-
-\#给name变量赋值 
+#给name变量赋值 
 
 [ -z "$name" ] && echo "yes" || echo "no"  
-
 no 
-
-\#判断name变量是否为空，因为不为空，所以返回no  
-
+#判断name变量是否为空，因为不为空，所以返回no  
 
 
 aa=11 
-
 bb=22 
-
-\#给变量aa和变量bb赋值 
-
+#给变量aa和变量bb赋值 
 [ "$aa" == "bb" ] && echo "yes" || echo "no"            
-
 no 
-
-\#判断两个变量的值是否相等，明显不相等，所以返回no
+#判断两个变量的值是否相等，明显不相等，所以返回no，虽然Linux中有的也有 = 判断等，但是使用习惯一般使用 ==
+```
 
 
 
@@ -3665,31 +3650,24 @@ no
 
 
 
+```
 aa=11 
-
 [ -n "$aa"  -a "$aa" -gt 23 ] && echo "yes" || echo "no" 
-
 no 
-
-\#判断变量aa是否有值，同时判断变量aa的是否大于23 
-
-\#因为变量aa的值不大于23，所以虽然第一个判断值为真，返回的结果也是假  
-
-
+#判断变量aa是否有值，同时判断变量aa的是否大于23 
+#因为变量aa的值不大于23，所以虽然第一个判断值为真，返回的结果也是假  
 
 aa=24 
-
 [ -n "$aa"  -a "$aa" -gt 23 ] && echo "yes" || echo "no" yes
+```
+
+
 
 ## **11.5 流程控制**
 
-##### **11.5.1  if语句**
+#### **11.5.1  if语句**
 
-1. 单分支if条件语句 
-
-
-
-
+**1、单分支if条件语句** 
 
 ```
 if  [ 条件判断式 ] ; then
@@ -3702,29 +3680,14 @@ if  [ 条件判断式 ]
 fi 
 ```
 
-
-
-
-
-  
-
-
-
-单分支条件语句需要注意几个点
+**单分支条件语句需要注意几个点**
 
 - if语句使用fi结尾，和一般语言使用大括号结尾不同 
 - [ 条件判断式 ]就是使用test命令判断，所以中括号和条件判断式之间必须有空格
 - then后面跟符合条件之后执行的程序，可以放在[]之后，用“；”分割。也可以换行写入，就不需要“；”了
 
-
-
-例子：判断分区使用率 
-
-
-
-
-
 ```
+# 例子：判断分区使用率 
 #!/bin/basn
 # 统计根分区使用率 
 # Author: shenchao （E-mail: shenchao@qq.com）  
@@ -3736,19 +3699,9 @@ fi
  fi
 ```
 
-
-
 ![image-20240320171038833](MD_Picture/image-20240320171038833.png)
 
-
-
-
-
-1. 双分支if条件语句 
-
-
-
-
+**2、双分支if条件语句** 
 
 ```
 if [ 条件判断式 ] 
@@ -3759,17 +3712,8 @@ if [ 条件判断式 ]
 fi
 ```
 
-
-
-
-
-例子1：备份mysql数据库 
-
-
-
-
-
 ```
+# 例子1：备份mysql数据库 
 #!/bin/bash
 #备份mysql数据库。
 # Author:shenchao（E-mail:shenchao@lampbrother.net）
@@ -3797,15 +3741,8 @@ if [ -d/tmp/dbbak ]
  fi
 ```
 
-
-
-
-
-例子2：判断apache是否启动
-
-
-
 ```
+#例子2：判断apache是否启动
 #!/bin/bash
 #Author:shenchao（E-mail:shenchao@lampbrother.net）
 port=$(nmap -sT 192.168.1.156 | grep tcp | grep http |awk'{print$2}')
@@ -3819,17 +3756,7 @@ if [ "$port"=="open" ]
 fi
 ```
 
-
-
-
-
-
-
-1. 多分支if条件语句
-
-
-
-
+**3、多分支if条件语句**
 
 ```
 if [ 条件判断式1 ]
@@ -3844,15 +3771,8 @@ else
 fi
 ```
 
-
-
-
-
-例子
-
-
-
 ```
+# 例子
 #!/bin/bash
 #判断用户输入的是什么文件
 #Author:shenchao（E-mail:shenchao@lampbrother.net）
@@ -3881,27 +3801,22 @@ else
 fi
 ```
 
+------
 
 
 
-
-
-
-##### **11.5.2  case语句** 
+#### **11.5.2  case语句** 
 
 **多分支case条件语句** 
 
 - case语句和if…elif…else语句一样都是多分支条件语句，不过和if多分支条件语句不同的是，case语句只能判断一种条件关系，而if语句可以判断多种条件关系。
 
-
-
-
-
 ```
-case $ 变量名 in  
+格式：
+case $变量名 in  
     " 值1"）   
          如果变量的值等于值1，则执行程序1   
-        ; ;
+        ; ;
      " 值2"）   
          如果变量的值等于值2，则执行程序2  
           ; ;  
@@ -3910,15 +3825,8 @@ case $ 变量名 in
       如果变量的值都不是以上的值，则执行此程序 
       ; ;
 esac 
+俩分号代表命令的结束
 ```
-
-
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -3927,45 +3835,31 @@ esac
 read -p"Pleasechooseyes/no:" -t 30 cho
 case $cho in
     "yes")
-        echo"Yourchooseisyes!"
+        echo"Yourchoose is yes!"
         ;;       
     "no")
-        echo"Yourchooseisno!"
+        echo"Yourchoose is no!"
         ;;
     *)
-    echo"Yourchooseiserror!"
+    echo"Yourchoose is error!"
     ;;
 esac
 ```
 
 
 
+#### **11.5.3  for循环** 
 
-
-
-
-
-
-##### **11.5.3  for循环** 
-
-语法一
-
-
+**语法一**
 
 ```
-for 变量 in 值1 值2 值3
+for 变量 in 值1 值2 值3...
     do 
         程序
     done
+  
+ # 功能： 只要后面有几个值就执行几次
 ```
-
-
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -3975,43 +3869,28 @@ for city in beijing nanjing shanghai
     done 
 ```
 
-
-
-
-
-输出：
-
+```
+输出：循环的值
 this city is beijing 
-
 this city is nanjing 
-
 this city is shanghai 
-
-
-
-
+```
 
 ```
 #!/bin/bash
 #批量解压缩脚本
 cd /sh
 ls *.tar.gz -> ls.log
+# 将sh 文件夹下以 .tar.gz结尾的文件都写入 ls.log 文件中
 for i in $(cat ls.log)
+#里面有几个压缩包的文件名，就会循环几次。
     do
        tar -zxf $i &> /dev/null
     done 
 rm -rf /sh/ls.log
 ```
 
-
-
-
-
-
-
-语法二
-
-
+**语法二**
 
 ```
 for((初始值;循环控制条件;变量变化))
@@ -4019,14 +3898,6 @@ for((初始值;循环控制条件;变量变化))
         程序
     done
 ```
-
-
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -4040,19 +3911,19 @@ for((i=1;i<=100;i++))
 echo "this sum of 1+2+...+100 is: $num"
 ```
 
+![image-20240328235907941](MD_Picture/image-20240328235907941.png)
+
+```
+注意，中间 sed 部分，正则应该使用  ^ 以数字开头， $ 以数字结尾  * 出现一次多次
+```
 
 
 
+#### **11.5.4  while循环与until循环**
 
-
-
-##### **11.5.4  while循环与until循环**
-
-1. **while循环** 
+**1、while循环** 
 
 - while循环是不定循环，也称作条件循环。只要条件判断式成立，循环就会一直继续，直到条件判断式不成立，循环才会停止。这就和for的固定循环不太一样了。
-
-
 
 
 
@@ -4062,14 +3933,6 @@ while [ 条件判断式 ]
         程序
     done
 ```
-
-
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -4083,20 +3946,14 @@ while [ $i -le 100 ]
         s=$(($s+$i))
         i=$(($i+1))
     done
-echo"Thesumis:$s"
+echo"The sum is:$s"
 ```
 
 
 
-
-
-
-
-1. until循环 
+**2、until循环** 
 
 - until循环，和while循环相反，until循环时只要条件判断式不成立则进行循环，并执行循环程序。一旦循环条件成立，则终止循环。
-
-
 
 
 
@@ -4106,14 +3963,6 @@ until [ 条件判断式 ]
         程序
     done
 ```
-
-
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -4133,15 +3982,9 @@ echo"Thesumis:$s"
 
 
 
-
-
 ## **11.6 函数**
 
-语法：
-
-
-
-
+**语法：**
 
 ```
 [ function ] funname [()]{
@@ -4150,21 +3993,11 @@ echo"Thesumis:$s"
 }
 ```
 
-
-
-
-
 [] -> 表示可以省略
 
 **tips:在以上的函数语法中，前面的funcation 表示声明一个函数！！！ 可以不写 return -n 是指退出函数**
 
 **参考：**https://www.cnblogs.com/YankaiJY/p/8832436.html
-
-
-
-
-
-
 
 ```
 #!/bin/bash
@@ -4179,15 +4012,7 @@ funWithReturn
 echo "输入的两个数字之和为 $? !"
 ```
 
-
-
-
-
 输出：
-
-
-
-
 
 ```
 [timo@local1 sh]$ sh function.sh 
@@ -4204,17 +4029,17 @@ echo "输入的两个数字之和为 $? !"
 
 
 
-
-
 # **第十二讲 Linux服务管理**
 
-#### **12.1  服务简介与分类**
+## **12.1  服务简介与分类**
 
-1. 服务的分类
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/b90c7e8e3391b24d7f572eba86e8ae3b/0?w=1100&h=606)        
 
-启动与自启动 
+**1、服务的分类**
+
+![image-20240330031948601](MD_Picture/image-20240330031948601.png)                 
+
+**启动与自启动** 
 
 - 服务启动：就是在当前系统中让服务运行，并提供功能。 
 
@@ -4222,65 +4047,81 @@ echo "输入的两个数字之和为 $? !"
 
 
 
-查询已安装的服务
+**查询已安装的服务**
 
 - RPM包安装的服务 
+  - chkconfig  --list 
 
-- - chkconfig  --list 
 
-\#查看服务自启动状态，可以看到所有RPM包安装的服务  
+​							 #查看服务自启动状态，可以看到所有RPM包安装的服务 ，不能看源码包安装，345都启动代表开机启动
+
+​							#如何查看是否启动？pa aux |  grep crond   或者  netstat -tlun 有的 crond 没有端口，不显示
 
 - 源码包安装的服务 
-
-- - 查看服务安装位置，一般是/usr/local/下
-
+  - 查看服务安装位置，一般是/usr/local/下
 
 
-RPM安装服务和源码包安装服务的区别
 
-- RPM安装服务和源码包安装服务的区别就是安装位置的不同
 
-- - 源码包安装在指定位置，一般是/usr/local/ 
+**RPM安装服务和源码包安装服务的区别**
+
+- RPM安装服务和源码包安装服务的区别就是**安装位置的不同**
+
+  - 源码包安装在指定位置，一般是/usr/local/ 
+
   - RPM包安装在默认位置中
 
-#### **12.2 RPM包安装服务的管理**
+  - 其实主要的区别就是安装的位置，如果修改一下位置，其实也可以利用RPM包安装的方式查看源码包
 
-##### **12.2.1  独立服务的管理**
+    
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/b90c7e8e3391b24d7f572eba86e8ae3b/0?w=1100&h=606)        
 
-1. RPM包安装服务的位置 
+------
+
+
+
+## **12.2 RPM包安装服务的管理**
+
+#### **12.2.1  独立服务的管理**
+
+![image-20240330032037162](MD_Picture/image-20240330032037162.png)
+
+​                    
+
+**1、RPM包安装服务的位置** 
 
 - RPM安装服务和源码包安装服务的区别就是安装位置的不同
-
-- - 源码包安装在指定位置，一般是/usr/local/ 
+  - 源码包安装在指定位置，一般是/usr/local/ 
   - RPM包安装在默认位置中 /etc/init.d/：启动脚本位置
 
+- /etc/init.d/ : 启动脚本位置
 - /etc/sysconfig/：初始化环境配置文件位置 
-
 - /etc/：配置文件位置 
-
 - /etc/xinetd.conf：xinetd配置文件 
-
 - /etc/xinetd.d/：基于xinetd服务的启动脚本
-
 - /var/lib/：服务产生的数据放在这里 
-
 - /var/log/：日志
 
 
 
-1. 独立服务的启动 
+**2、独立服务的启动** 
 
 - /etc/init.d/独立服务名  start|stop|status|restart|    
-- service  独立服务名  start|stop|restart||status 
+
+- service  独立服务名  start|stop|restart||status  
+
+  ​				# 这里启动的其实也是利用了默认的路径，修改路径可使用源码安装的包
 
 
 
-1. 独立服务的自启动 
+**3、独立服务的自启动** 
 
 - chkconfig [--level 运行级别] [独立服务名] [on|off]   
+
 - 修改/etc/rc.d/rc.local文件   
+
+  ​					# 系统启动之前，先执行这个命令。
+
 - 使用ntsysv命令管理自启动
 
 **tips:** service和chkconfig命令的功能在Centos7中好像都被阉割了。被**systemctl**取代。
@@ -4289,310 +4130,285 @@ RPM安装服务和源码包安装服务的区别
 
 
 
-##### **12.2.2  基于xinetd服务的管理**
+#### **12.2.2  基于xinetd服务的管理**
 
-**Xinetd：**即extended internet daemon，是新一代的网络守护进程服务程序，又叫超级Internet服务器，常用来管理多种轻量级Internet服务。Xinetd提供类似于inetd+tcp_wrapper的功能，但是更加强大和安全。
+**Xinetd：**即extended internet daemon，是新一代的网络守护进程服务程序，又叫超级Internet服务器，常用来管理多种轻量级Internet服务。Xinetd提供类似于inetd+tcp_wrapper的功能，但是更加强大和安全。自启动和启动同步。
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/b90c7e8e3391b24d7f572eba86e8ae3b/0?w=1100&h=606)        
+![image-20240330032059004](MD_Picture/image-20240330032059004.png)               
 
-1. 安装xinetd与telnet 
+​          
 
-[root@localhost ~]# yum -y install xinetd  
+**1、安装xinetd与telnet** 
+
+[root@localhost ~]# **yum -y install xinetd**  
+
+[root@localhost ~]# **yum -y install telnet-server** 
 
 
 
-[root@localhost ~]# yum -y install telnet-server 
+**2、xinetd服务的启动**
 
-1. xinetd服务的启动
+[root@localhost ~]# **vi /etc/xinetd.d/telnet** 
 
-[root@localhost ~]# vi /etc/xinetd.d/telnet 
-
+```
 service telnet  <- 服务的名称为telnet
-
- {         
-
-flags           = REUSE  <- 标志为REUSE，设定TCP/IP socket可重用
-
-socket_type     = stream  <-使用TCP协议数据包         
-
-wait            = no  <-允许多个连接同时连接         
-
-user            = root  <- 启动服务的用户为root         
-
-server          = /usr/sbin/in.telnetd  <- 服务的启动程序         
-
-log_on_failure  += USERID  <- 登陆失败后，记录用户的ID         
-
-disable         = no   <- 服务不启动
-
+{         
+	flags           = REUSE  <- 标志为REUSE，设定TCP/IP socket可重用
+	socket_type     = stream  <-使用TCP协议数据包         
+	wait            = no  <-允许多个连接同时连接         
+	user            = root  <- 启动服务的用户为root         
+	server          = /usr/sbin/in.telnetd  <- 服务的启动程序         
+	log_on_failure  += USERID  <- 登陆失败后，记录用户的ID         
+	disable         = no   <- 服务不启动
 }
+```
+
+重启xinetd服务 [root@localhost ~]# **service xinetd restart**
 
 
 
-重启xinetd服务 [root@localhost ~]# service xinetd restart
+**xinetd服务的自启动** 
+
+- [root@localhost ~]# **chkconfig telnet on**   
+- **ntsysv**
+
+------
 
 
 
-1. xinetd服务的自启动 
+## **12.3 源码包安装服务的管理**
 
-- [root@localhost ~]# chkconfig telnet on   
-- ntsysv
+**1、源码包安装服务的启动** 
 
-#### **12.3 源码包安装服务的管理**
+- 使用绝对路径，调用启动脚本来启动。不同的源码包的启动脚本不同。可以查看源码包的安装说明（vi INSTALL)，查看启动脚本的方法。 
 
-1. 源码包安装服务的启动 
+ **/usr/local/apache2/bin/apachectl  start|stop** 
 
-- 使用绝对路径，调用启动脚本来启动。不同的源码包的启动脚本不同。可以查看源码包的安装说明，查看启动脚本的方法。 
-
- /usr/local/apache2/bin/apachectl  start|stop 
+![image-20240330061437052](MD_Picture/image-20240330061437052.png)
 
 
 
-1. 源码包服务的自启动 
+**2、源码包服务的自启动** 
 
-[root@localhost ~]# vi /etc/rc.d/rc.local 
+[root@localhost ~]# **vi /etc/rc.d/rc.local** 
 
-加入 
-
-/usr/local/apache2/bin/apachectl  start
+加入     /usr/local/apache2/bin/apachectl  start
 
 
 
-1. 让源码包服务被服务管理命令识别 
+**3、让源码包服务被服务管理命令识别** 
 
 - 让源码包的apache服务能被service命令管理启动 
 
-ln -s /usr/local/apache2/bin/apachectl /etc/init.d/apache   
-
-
+​						软连接   ln -s /usr/local/apache2/bin/apachectl /etc/init.d/apache   
 
 - 让源码包的apache服务能被chkconfig与ntsysv命令管理自启动  
 
+```
 vi /etc/init.d/apache 
-
-\# chkconfig: 35 86 76 
-
-\#指定httpd脚本可以被chkconfig命令管理。格式是：  
-
-chkconfig： 运行级别 启动顺序 关闭顺序 
-
-\# description: source package apache 
-
-\#说明，内容随意
-
+# chkconfig: 35 86 76 
+#指定httpd脚本可以被chkconfig命令管理。格式是：  
+				chkconfig： 运行级别 启动顺序 关闭顺序 启动和关闭顺序不能和系统现有的启动和关闭顺序相同
+# description: source package apache 
+#说明，内容随意
 
 
 [root@localhost ~]# chkconfig --add apache 
-
-\#把源码包apache加入chkconfig命令
-
-
-
-#### **12.4 服务管理总结**
-
-脑图地址
+#把源码包apache加入chkconfig命令
+```
 
 
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/d246ef6a527a876cb6d5b847c47138bb/0?w=1768&h=1052)        
+## **12.4 服务管理总结**
+
+
+
+![image-20240330032139142](MD_Picture/image-20240330032139142.png)                
+
+ 
+
+
 
 # **第十三章 Linux系统管理**
 
-#### **13.1 进程管理**
+## **13.1 进程管理**
 
-##### **13.1.1  进程查看**
+#### **13.1.1  进程查看**
 
-1. 进程简介 
+**1、进程简介** 
 
 - 进程是正在执行的一个程序或命令，每一个进程都是一个运行的实体，都有自己的地址空间，并占用一定的系统资源。 
 
-1. 进程管理的作用
+**2、进程管理的作用**
 
 - 判断服务器健康状态 
 - 查看系统中所有进程 
 - 杀死进程
 
+**3、查看系统中所有进程**
 
+[root@localhost ~]# **ps aux** 						#查看系统中所有进程，使用BSD操作系统格式 
 
-1. 查看系统中所有进程
-
-[root@localhost ~]# ps aux 
-
-\#查看系统中所有进程，使用BSD操作系统格式 
-
-[root@localhost ~]# ps -le 
-
-\#查看系统中所有进程，使用Linux标准命令格式。 
+[root@localhost ~]# **ps -le** 						  #查看系统中所有进程，使用Linux标准命令格式。 
 
 - USER：该进程是由哪个用户产生的； 
-
 - PID：进程的ID号； 
-
 - %CPU：该进程占用CPU资源的百分比，占用越高，进程越耗费资源；
-
 - %MEN：该进程占用物理内存的百分比，占用越高，进程越耗费资源； 
-
 - VSZ: 该进程占用虚拟内存的大小，单位KB；
-
 - RSS：该进程占用实际物理内存的大小，单位KB； 
-
 - TTY：该进程是在哪个终端中运行的。其中tty1-tty7代表本地控制台终端，tty1-tty6是本地的字符界面终端，tty7 是图形终端。pts/0-255代表虚拟终端。
-
 - STAT：进程状态。常见的状态有：
-
-- - R：运行
+  - R：运行
   - S：睡眠
   - T：停止状态
   - s：包含子进程
   - +：位于后台 
 
 - START：该进程的启动时间 
-
 - TIME：该进程占用CPU的运算时间，注意不是系统时间 
-
 - COMMAND：产生此进程的命令名
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/b3a1df554f84bcb79f177e3728c1fd87/0?w=1572&h=360)        
+![image-20240330032203769](MD_Picture/image-20240330032203769.png)             
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/2d9c9e0677f7b4f369b9001212a34de3/0?w=1394&h=336)        
+![image-20240330032223296](MD_Picture/image-20240330032223296.png)
+
+
 
 **tips: ps aux 和 ps -ef 区别**
 
+```
 两者没太大差别，讨论这个问题，要追溯到Unix系统中的两种风格，System Ｖ风格和BSD 风格，ps aux最初用到Unix Style中，而ps -ef被用在System V Style中，两者输出略有不同。现在的大部分Linux系统都是可以同时使用这两种方式的。
+```
 
-其中各列的内容意思如下
+> 其中各列的内容意思如下
+>
+> UID  //用户ID、但输出的是用户名 
+>
+> PID  //进程的ID 
+>
+> PPID  //父进程ID 
+>
+> C   //进程占用CPU的百分比 
+>
+> STIME //进程启动到现在的时间 
+>
+> TTY  //该进程在那个终端上运行，若与终端无关，则显示? 若为pts/0等，则表示由网络连接主机进程。 
+>
+> CMD  //命令的名称和参数
+>
 
-UID  //用户ID、但输出的是用户名 
-
-PID  //进程的ID 
-
-PPID  //父进程ID 
-
-C   //进程占用CPU的百分比 
-
-STIME //进程启动到现在的时间 
-
-TTY  //该进程在那个终端上运行，若与终端无关，则显示? 若为pts/0等，则表示由网络连接主机进程。 
-
-CMD  //命令的名称和参数
 
 
+**4、查看系统健康状态** 
 
-1. 查看系统健康状态 
+[root@localhost]#  **top [ 选项]** 
 
-[root@localhost]#  top [ 选项] 
+**选项：** 
 
-选项： 
+- \- d  秒数： 指定top命令每隔几秒更新。默认是3秒 在top命令的交互模式当中可以执行的命令：  
 
-\- d  秒数： 指定top命令每隔几秒更新。默认是3秒 在top命令的交互模式当中可以执行的命令：  
+- ？或 h：  显示交互模式的帮助  
 
-？或h：  显示交互模式的帮助  
+- P：   以CPU使用率排序，默认就是此项  
 
-P：   以CPU使用率排序，默认就是此项  
+- M：   以内存的使用率排序  
 
-M：   以内存的使用率排序  
+- N：   以PID排序  
 
-N：   以PID排序  
+- q：   退出top
 
-q：   退出top
 
 
 
 **第一行信息为任务队列信息 [****重点关注load average****]**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/c8da8aa417c4cdb3fd7690b80340ce0a/0?w=864&h=462)        
+![image-20240330032245802](MD_Picture/image-20240330032245802.png)                
 
+**第二行为进程信息**  
 
-
-**第二行为进程信息**                 ![img](https://qqadapt.qpic.cn/txdocpic/0/98b877a1b778022866047f4bc0caad0b/0?w=912&h=484)        
+![image-20240330032318592](MD_Picture/image-20240330032318592.png)                     
 
 **第三行为CPU信息 [****重点关注 id(空闲cpu百分比)****]**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/290d397ab79a974533564412643af57d/0?w=942&h=532)        
+![image-20240330032342832](MD_Picture/image-20240330032342832.png)              
 
-**第四行为物理内存信息 [****重点关注free****]**
+**第四行为物理内存信息 [****重点关注free****]**             ![image-20240330032403418](MD_Picture/image-20240330032403418.png)
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/a9448620d6f6fcc35e977d9e9b1c5dae/0?w=944&h=504)        
-
-**第五行为交换分区（swap）信息**
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/7be9bb3cefb995a1cbd203c00fb95afd/0?w=946&h=488)        
-
-1. 查看进程树 
-
-[root@localhost]# pstree  [选项]
-
-选项：  
-
-\- p ： 显示进程的PID  
-
-\- u ： 显示进程的所属用户
-
-##### **13.1.2  终止进程**
-
-1. kill命令 
-
-[root@localhost ~]# kill –l 
-
-\#查看可用的进程信号
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/19bb434390ca0be04461e0de1af45eeb/0?w=1562&h=950)        
+**第五行为交换分区（swap）信息**          ![image-20240330032421478](MD_Picture/image-20240330032421478.png)
 
 
 
-[root@localhost ~]# kill -1 22354 
+**5、查看进程树** 
 
-\#重启进程  
+[root@localhost]# **pstree  [选项]**
 
+**选项：**  
 
+- \- p ： 显示进程的PID  
 
-[root@localhost ~]# kill -9 22368 
+- \- u ： 显示进程的所属用户
 
-\#强制杀死进程
-
-
-
-1. killall命令 
-
-[root@localhost]# killall [ 选项][信号] 进程名 
-
-\#按照进程名杀死进程 
-
-选项：  
-
-\- i ： 交互式，询问是否要杀死某个进程  
-
-\- I ： 忽略进程名的大小写  
+------
 
 
 
-1. pkill命令
+#### **13.1.2  终止进程**
 
-[root@localhost]# pkill  [ 选项] [信号] 进程名 
+**1、kill命令** 
 
-\#按照进程名终止进程 选项：  
+[root@localhost ~]# **kill –l**             #查看可用的进程信号
 
-\- t  终端号： 按照终端号踢出用户
+![image-20240330032449080](MD_Picture/image-20240330032449080.png)                
+
+ **命令格式：**
+
+- kill [选项] 进程pid
+
+[root@localhost ~]# **kill -1 22354**           #重启进程  
+
+
+
+[root@localhost ~]# **kill -9 22368**          #强制杀死进程
+
+
+
+**2、killall命令** 
+
+[root@localhost]# **killall [ 选项][信号] 进程名** 				#按照进程名杀死进程 
+
+**选项：**  
+
+- \- i ： 交互式，询问是否要杀死某个进程  
+
+- \- I ： 忽略进程名的大小写  
+
+
+
+
+**3、pkill命令**
+
+[root@localhost]# **pkill  [ 选项] [信号] 进程名** 						#按照进程名终止进程
+
+ **选项：**  
+
+- -t  终端号： 按照终端号踢出用户
 
 
 
 **按照终端号踢出用户** 
 
-[root@localhost ~]# w 
+[root@localhost ~]# **w** 										  #使用w命令查询本机已经登录的用户  
 
-\#使用w命令查询本机已经登录的用户  
+[root@localhost ~]# **pkill -t -9 pts/1** 				#强制杀死从pts/1虚拟终端登录的进程
 
-
-
-[root@localhost ~]# pkill -t -9 pts/1 
-
-\#强制杀死从pts/1虚拟终端登录的进程
+------
 
 
 
-#### **13.2 工作管理**
+## **13.2 工作管理**
 
-1. 把程序放入后台
+**1、把程序放入后台**
 
 - tar -zcf etc.tar.gz /etc &  [程序还在运行]
 - [root@localhost ~]# top 
@@ -4601,191 +4417,180 @@ q：   退出top
 
 
 
-1. 查看后台的工作
+**2、查看后台的工作**
 
-[root@localhost]# jobs [-l]
+[root@localhost]# **jobs [-l]**
 
-选项：
+**选项：**
 
--l: 显示工作的PID
+- -l: 显示工作的PID
 
-注："+"号表示最近一个放入后台的工作，也是工作恢复时，默认恢复的工作。
+​				注："+"号表示最近一个放入后台的工作，也是工作恢复时，默认恢复的工作。
 
-"-"号代表倒数第二个放入后台的工作
-
-
-
-1. 将后台暂停的工作恢复到前台执行
-
-[root@localhost]# fg %工作号
-
-参数：
-
-%工作号：%号可以省略，但是注意工作号和PID的区别
+​							"-"号代表倒数第二个放入后台的工作
 
 
 
-1. 把后台暂停的工作恢复到后台执行
+**3、将后台暂停的工作恢复到前台执行**
 
-[root@localhost]# bg %工作号
+[root@localhost]# **fg %工作号**
 
-注：后台恢复执行的命令，是不能和前台有交互的，否则不能恢复到后台执行。
+**参数：**
 
-即：命令和前台有交互是不能恢复到后台运行。例如：top
-
-
-
-#### **13.3 系统资源查看**
-
-1. vmstat命令监控系统资源
-
-[root@localhost ~]# vmstat [刷新延时 刷新次数]  
+​				%工作号：%号可以省略，但是注意工作号和PID的区别
 
 
 
-例如： 
+**4、把后台暂停的工作恢复到后台执行**
 
+[root@localhost]# **bg %工作号**
+
+​				注：后台恢复执行的命令，是不能和前台有交互的，否则不能恢复到后台执行。
+
+​							即：命令和前台有交互是不能恢复到后台运行。例如：top
+
+------
+
+
+
+## **13.3 系统资源查看**
+
+**1、vmstat命令监控系统资源**
+
+[root@localhost ~]# **vmstat [刷新延时 刷新次数]**  
+
+```
 [root@localhost proc]# vmstat 1 3  
+```
+
+**2、dmesg开机时内核检测信息** 
+
+[root@localhost ~]# **dmesg** 
+
+[root@localhost ~]# **dmesg | grep CPU**
 
 
 
-1. dmesg开机时内核检测信息 
+**3、free命令查看内存使用状态** 
 
-[root@localhost ~]# dmesg 
+[root@localhost ~]# **free [-b|-k|-m|-g]** 
 
-[root@localhost ~]# dmesg | grep CPU
+**选项：**  
 
+- -b： 以字节为单位显示  
+- -k： 以KB为单位显示，默认就是以   KB为单位显示  
 
+- -m： 以MB为单位显示  
 
-1. free命令查看内存使用状态 
-
-[root@localhost ~]# free [-b|-k|-m|-g] 
-
-选项：  
-
--b： 以字节为单位显示  
-
--k： 以KB为单位显示，默认就是以   KB为单位显示  
-
--m： 以MB为单位显示  
-
--g： 以GB为单位显示  
+- -g： 以GB为单位显示  
 
 
 
 **缓存和缓冲的区别**
 
-- 简单来说缓存（cache）是用来加速数据从硬盘中“读取”的，而缓冲（buffer）是用来加速数据“写入”硬盘的。
+- 简单来说缓存（cache）是用来加速数据从硬盘中“**读取**”的，而缓冲（buffer）是用来加速数据“**写入**”硬盘的。
 
-tips:向硬盘写入数据的时候,现存在缓冲中,达到一定规模,写入到硬盘。减少写入写出操作。
-
-
-
-1. 查看CPU信息
-
-[root@localhost ~]# cat /proc/cpuinfo  
+​				tips:向硬盘写入数据的时候,现存在缓冲中,达到一定规模,写入到硬盘。减少写入写出操作。
 
 
 
-1. uptime命令 
+**4、查看CPU信息**
 
-[root@localhost ~]# uptime  
+[root@localhost ~]# **cat /proc/cpuinfo**    # 断电消失，每次都重新写入
+
+
+
+**5、uptime命令** 
+
+[root@localhost ~]# **uptime**  
 
 \#显示系统的启动时间和平均负载，也就是top命令的第一行。w命令也可以看到这个数据。
 
 
 
-1. 查看系统与内核相关信息
+**6、查看系统与内核相关信息**
 
-[root@localhost ~]# uname [选项] 
+[root@localhost ~]# **uname [选项]** 
 
 选项： 
 
--a： 查看系统所有相关信息；  
+- -a： 查看系统所有相关信息；  
+- -r： 查看内核版本；  
 
--r： 查看内核版本；  
-
--s： 查看内核名称。 
+- -s： 查看内核名称。 
 
 
 
  **判断当前系统的位数**
 
-[root@localhost ~]# file /bin/ls
+[root@localhost ~]# **file /bin/ls**
 
 
 
 **查询当前Linux系统的发行版本** 
 
-[root@localhost ~]# lsb_release -a  
+[root@localhost ~]# **lsb_release -a**  
 
 
 
-1. 列出进程打开或使用的文件信息 
+**7、列出进程打开或使用的文件信息** 
 
-[root@localhost ~ ] #  lsof [ 选项] 
+[root@localhost ~ ] #  **lsof [ 选项]** 
 
 \# 列出进程调用或打开的文件的信息 
 
-选项： 
+**选项：** 
 
-\- c  字符串： 只列出以字符串开头的进程打开的文件  
+- \- c  字符串： 只列出以字符串开头的进程打开的文件  
 
-\- u  用户名： 只列出某个用户的进程打开的文   件  
+- \- u  用户名： 只列出某个用户的进程打开的文   件  
 
-\- p  pid ：  列出某个PID进程打开的文件
+- \- p  pid ：  列出某个PID进程打开的文件
 
 
-
-#### **13.4 系统定时任务**
-
-1. **crond服务管理与访问控制** 
-
-[root@localhost ~]# service crond restart   
+------
 
 
 
-[root@localhost ~]# chkconfig crond on
+## **13.4 系统定时任务**
+
+**1、crond服务管理与访问控制** 
+
+[root@localhost ~]# **service crond restart**   
+
+[root@localhost ~]# **chkconfig crond on**
 
 
 
-1. 用户的crontab设置 
+**2、用户的crontab设置** 
 
-[root@localhost ~]# crontab [选项] 
+[root@localhost ~]# **crontab [选项]** 
 
-选项：  
+**选项：**  
 
--e：  编辑crontab定时任务  
+- -e：  编辑crontab定时任务  
+- -l：  查询crontab任务  
 
--l：  查询crontab任务  
-
--r：  删除当前用户所有的crontab任务
-
+- -r：  删除当前用户所有的crontab任务
 
 
-[root@localhost ~]# crontab -e 
+
+[root@localhost ~]# **crontab -e** 
 
 \#进入crontab编辑界面。会打开vim编辑你的工作。 
 
-\* * * * * 执行的任务
+\*  *  *  *  *  需要执行的任务 ![image-20240330032513315](MD_Picture/image-20240330032513315.png)                ![image-20240330032534840](MD_Picture/image-20240330032534840.png)
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/a52cab47fba8765a97ddf71a911d934c/0?w=890&h=536)        
+![image-20240330032559269](MD_Picture/image-20240330032559269.png)
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/960a3475db25aeec59cdda42469ac9cb/0?w=900&h=552)        
+​                       
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/f9e21e6ae9bb1dff3fa8a64ed73c47c6/0?w=956&h=574)        
-
+```
 举例 
-
 */5 * * * * /bin/echo ”11” >> /tmp/test 
-
 5 5 * * 2 /sbin/shutdown -r now  
-
 0 5 1,10,15 * * /root/sh/autobak.sh
-
-
-
-
+```
 
 ```
 [yasuo@local1 tmp]$ crontab -l
@@ -4795,21 +4600,23 @@ tips:向硬盘写入数据的时候,现存在缓冲中,达到一定规模,写入
 你好，明天2020年 04月 14日 星期二 00:25:01 CST
 ```
 
-
+------
 
 
 
 # **第十四讲 日志管理**
 
-#### **14.1 日志管理简介**
+## **14.1 日志管理简介**
 
-1. 日志服务
+**1、日志服务**
 
 - 在CentOS 6.x中日志服务已经由rsyslogd取代了原先的syslogd服务。rsyslogd日志服务更加先进，功能更多。但是不论该服务的使用，还是日志文件的格式其实都是和syslogd服务相兼容的，所以学习起来基本和syslogd服务一致。 
 
+  
+
 - rsyslogd的新特点： 
 
-- - 基于TCP网络协议传输日志信息； 
+  - 基于TCP网络协议传输日志信息； 
   - 更安全的网络传输方式；
   - 有日志消息的及时分析框架； 
   - 后台数据库； 
@@ -4818,76 +4625,85 @@ tips:向硬盘写入数据的时候,现存在缓冲中,达到一定规模,写入
 
 
 
+
 **确定服务启动**
 
-[root@localhost ~]# ps aux | grep rsyslogd
-
-\#查看服务是否启动  
-
-
-
-chkconfig --list | grep rsyslog 
-
-systemctl list-unit-files | grep rsyslog  **[****Centos7****]**
-
-\#查看服务是否自启动
-
-
-
-1. 常见日志的作用
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/075f1ba464b745bdc824f1d06f38809e/0?w=924&h=498)        
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/29ab4554a1c47a73dd174e915d644e96/0?w=908&h=548)        
+> [root@localhost ~]# **ps aux | grep rsyslogd**
+>
+> \#查看服务是否启动  
+>
+> chkconfig --list | grep rsyslog 
+>
+> systemctl list-unit-files | grep rsyslog  [**Centos7**]
+>
+> \#查看服务是否自启动
+>
 
 
 
-- 除了系统默认的日志之外，采用RPM方式安装的系统服务也会默认把日志记录在/var/log/目录中（源码包安装的服务日志是在源码包指定目录中）。不过这些日志不是由rsyslogd服务来记录和管理的，而是各个服务使用自己的日志管理文档来记录自身日志。
+**2、常见日志的作用**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/0502840904158cb04497e27bbd702a48/0?w=938&h=530)        
+​              ![image-20240330032644779](MD_Picture/image-20240330032644779.png)   ![image-20240330032707788](MD_Picture/image-20240330032707788.png)
+
+​     **除了系统默认的日志之外，采用RPM方式安装的系统服务也会默认把日志记录在/var/log/目录中（源码包安装的服务日志是在源码包指定目录中）。不过这些日志不是由rsyslogd服务来记录和管理的，而是各个服务使用自己的日志管理文档来记录自身日志。**         ![image-20240330032730442](MD_Picture/image-20240330032730442.png)      
 
 
 
-#### **14.2 rsyslogd日志服务**
+------
 
-1. 日志文件格式 
+
+
+## **14.2 rsyslogd日志服务**
+
+**1、日志文件格式** 
 
 - 基本日志格式包含以下四列： 
 
-- - 事件产生的时间； 
+  - 事件产生的时间； 
+
   - 发生事件的服务器的主机名；
+
   - 产生事件的服务名或程序名；
+
   - 事件的具体信息。 
-  - 
 
- 2、/etc/rsyslog.conf配置文件 
-
-authpriv.*                          /var/log/secure 
-
-\#服务名称[连接符号]日志等级  日志记录位置 
-
-\#认证相关服务.所有日志等级  记录在/var/log/secure日志中
+    
 
 
+ **2、/etc/rsyslog.conf配置文件** 
 
-**服务名称**
+​					**authpriv.*                          /var/log/secure** 
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/065505a09bfe2af144dd671a7589bf6f/0?w=898&h=472)        
+​						#服务名称[连接符号]日志等级  日志记录位置   
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/c0ef5f37c5b3a828a900d670d59a1a4d/0?w=896&h=534)        
+​															服务名称authpriv[连接符号.]日志等级*  日志记录位置 
+
+​						#认证相关服务.所有日志等级  记录在/var/log/secure日志中
+
+
+
+​																			**服务名称**
+
+![image-20240330032756753](MD_Picture/image-20240330032756753.png)             ![image-20240330032820495](MD_Picture/image-20240330032820495.png)        
 
 **连接符号** 
 
 - 连接符号可以识别为：
 
-- - “*”代表所有日志等级，比如：“authpriv.*”代表authpriv认证信息服务产生的日志，所有的日志等级都记录 
+  - “ * ”代表所有日志等级，比如：“authpriv.*”代表authpriv认证信息服务产生的日志，所有的日志等级都记录 
+
   - “.”代表只要比后面的等级高的（包含该等级）日志都记录下来。比如：“cron.info”代表cron服务产生的日志，只要日志等级大于等于info级别，就记录 
+
   - “.=”代表只记录所需等级的日志，其他等级的都不记录。比如：“*.=emerg”代表人和日志服务产生的日志，只要等级是emerg等级就记录。这种用法及少见，了解就好 
+
   - “.!”代表不等于，也就是除了该等级的日志外，其他等级的日志都记录。
 
-**日志等级**
+    
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/4f65dcc63069495e36da467b0b4d075b/0?w=902&h=482)        
+
+​																				**日志等级**
+
+![image-20240330032848193](MD_Picture/image-20240330032848193.png)  
 
 **日志记录位置** 
 
@@ -4899,50 +4715,47 @@ authpriv.*                          /var/log/secure
 
 
 
-#### **14.3 日志轮替**
+------
 
-1. **日志文件的命名规则**
+
+
+## **14.3 日志轮替**
+
+**1、日志文件的命名规则**
 
 - 如果配置文件中拥有“dateext”参数，那么日志会用日期来作为日志文件的后缀，例如“secure-20130605”。这样的话日志文件名不会重叠，所以也就不需要日志文件的改名，只需要保存指定的日志个数，删除多余的日志文件即可。 
 - 如果配置文件中没有“dateext”参数，那么日志文件就需要进行改名了。当第一次进行日志轮替时，当前的“secure”日志会自动改名为“secure.1”，然后新建“secure”日志，用来保存新的日志。当第二次进行日志轮替时，“secure.1”会自动改名为“secure.2”，当前的“secure”日志会自动改名为“secure.1”，然后也会新建“secure”日志，用来保存新的日志，以此类推。
 
+```
+轮替：切割和轮换
+```
 
 
-1. **logrotate配置文件**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/6254cba458b05bed9b54b5cb841f0079/0?w=864&h=444)        
+​																				**logrotate配置文件**        ![image-20240330032908670](MD_Picture/image-20240330032908670.png)             ![image-20240330032953461](MD_Picture/image-20240330032953461.png)                 
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/db9d9c61c7086ff9b82334b8b51f417f/0?w=878&h=536)        
+**3、把apache日志加入轮替** 
 
-1. **把apache日志加入轮替** 
-
+```
 [root@localhost ~]# vi /etc/logrotate.conf  
-
 /usr/local/apache2/logs/access_log {
-
-​       daily    
-
-create     
-
-rotate 30 
-
+    daily    
+	create     
+	rotate 30 
 } 
+#大括号里面是本地配置，不然以外部的全局配置为主
+```
 
+**logrotate命令**
 
+[root@localhost ~]# **logrotate [选项] 配置文件名** 
 
-1. **logrotate命令**
+**选项：**  
 
-[root@localhost ~]# logrotate [选项] 配置文件名 
+- 如果此命令没有选项，则会按照配置文件中的条件进行日志轮替  
 
-选项：  
-
-如果此命令没有选项，则会按照配置文件中的条件进行日志轮替  
-
--v： 显示日志轮替过程。加了-v选项，会显示日志的轮 替的过程  
-
--f： 强制进行日志轮替。不管日志轮替的条件是否已经 符合，强制配置文件中所有的日志进行轮替
-
-
+- -v： 显示日志轮替过程。加了-v选项，会显示日志的轮 替的过程  
+- -f： 强制进行日志轮替。不管日志轮替的条件是否已经 符合，强制配置文件中所有的日志进行轮替
 
 
 
@@ -4950,325 +4763,389 @@ rotate 30
 
 # **第十五章 启动管理**
 
-#### **15.1 CentOS 6.x启动管理**
+## **15.1 CentOS 6.x启动管理**
 
-##### **15.1.1 系统运行级别**
+#### **15.1.1 系统运行级别**
 
-1. **运行级别**
+**1、运行级别**  ![image-20240330033022783](MD_Picture/image-20240330033022783.png)    
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/e7be547845bc06f89fd3e9163d20b435/0?w=882&h=474)        
+**2、运行级别命令**
 
-1. **运行级别命令**
+- [root@localhost ~]# **runlevel**  
 
-[root@localhost ~]# runlevel  
+  #查看运行级别命令   前面的数字代表前面的运行级别是哪一个界别  N代表开机级别
 
-\#查看运行级别命令  
+  
 
+- [root@localhost ~]# init 运行级别 
 
-
-[root@localhost ~]# init 运行级别 
-
-\#改变运行级别命令  
+​				#改变运行级别命令  
 
 
 
-1. **系统默认运行级别**
+**3、系统默认运行级别**
 
-[root@localhost ~]# vim /etc/inittab id:3:initdefault: #系统开机后直接进入哪个运行级别
+[root@localhost ~]# **vim /etc/inittab **
 
-
-
-##### **15.1.2 系统启动过程**
-
-启动流程图
+​				**文件中 id:3:initdefault: 代表了** #系统开机后直接进入哪个运行级别
 
 
 
-initramfs内存文件系统 
+------
 
-- CentOS 6.x中使用initramfs内存文件系统取代了CentOS 5.x中的initrd RAM Disk。
 
-他们的作用类似，可以通过启动引导程序加载到内存中，然后加载启动过程中所需要的内核模块，比如USB、SATA、SCSI 硬盘的驱动和LVM、RAID文件系统的驱动 
+
+#### **15.1.2 系统启动过程**
+
+**启动流程图**
+
+![image-20240330041816762](MD_Picture/image-20240330041816762.png)
+
+
+
+**initramfs内存文件系统** 
+
+- CentOS 6.x中使用initramfs内存文件系统取代了CentOS 5.x中的initrd RAM Disk。他们的作用类似，可以通过启动引导程序加载到内存中，然后加载启动过程中所需要的内核模块，比如USB、SATA、SCSI 硬盘的驱动和LVM、RAID文件系统的驱动 .
+
+```
+模拟一下上面的过程：
 
 mkdir /tmp/initramfs 
-
-\#建立测试目录 
-
+#建立测试目录 
 cp /boot/initramfs-2.6.32-279.el6.i686.img /tmp/initramfs/ 
-
-\#复制initramfs文件 
-
+#复制initramfs文件 
 cd /tmp/initramfs/ 
-
 file initramfs-2.6.32-279.el6.i686.img  
-
+# 查看一下是什么文件
 mv initramfs-2.6.32-279.el6.i686.img initramfs-2.6.32-279.el6.i686.img.gz 
-
-\#修改文件的后缀名为.gz 
-
+#修改文件的后缀名为.gz 
 gunzip initramfs-2.6.32-279.el6.i686.img.gz 
-
-\#解压缩  
-
+#解压缩  
 file initramfs-2.6.32-279.el6.i686.img  
-
 cpio -ivcdu < initramfs-2.6.32-279.el6.i686.img 
+#解压缩
 
-\#解压缩
+```
 
+**调用/etc/init/rcS.conf配置文件** 
 
+- **主要功能：** 
 
-调用/etc/init/rcS.conf配置文件 
-
-- 主要功能是两个： 
-
-- - 先调用/etc/rc.d/rc.sysinit，然后由/etc/rc.d/rc.sysinit配置文件进行Linux系统初始化。 
+  - 先调用/etc/rc.d/rc.sysinit，然后由/etc/rc.d/rc.sysinit配置文件进行Linux系统初始化。 
   - 然后再调用/etc/inittab，然后由/etc/inittab配置文件确定系统的默认运行级别。 
 
+  
+
+  - **由/etc/rc.d/rc.sysinit初始化**
+
+    - 获得网络环境 
+
+    - 挂载设备 
+
+    - 开机启动画面Plymouth（取替了过往的 RHGB）
+
+    - 判断是否启用SELinux 
+
+    - 显示于开机过程中的欢迎画面 
+
+    - 初始化硬件 
+
+    - 用户自定义模块的加载 
+
+    - 配置内核的参数 
+
+    - 设置主机名
+
+    - 同步存储器 
+
+    - 设备映射器及相关的初始化 
+
+    - 初始化软件磁盘阵列（RAID） 
+
+    - 初始化 LVM 的文件系统功能 
+
+    - 检验磁盘文件系统（fsck）
+
+    - 设置磁盘配额(quota) 
+
+    - 重新以可读写模式挂载系统磁盘 
+
+    - 更新quota（非必要） 
+
+    - 启动系统虚拟随机数生成器 
+
+    - 配置机器（非必要）
+
+    - 清除开机过程当中的临时文件
+
+    - 创建ICE目录 
+
+    - 启动交换分区（swap） 
+
+    - 将开机信息写入/var/log/dmesg文件中
 
 
-**由/etc/rc.d/rc.sysinit初始化**
-
-1. 获得网络环境 
-2. 挂载设备 
-3. 开机启动画面Plymouth（取替了过往的 RHGB）
-4. 判断是否启用SELinux 
-5. 显示于开机过程中的欢迎画面 
-6. 初始化硬件 
-7. 用户自定义模块的加载 
-8. 配置内核的参数 
-9. 设置主机名
-10. 同步存储器 
-11. 设备映射器及相关的初始化 
-12. 初始化软件磁盘阵列（RAID） 
-13. 初始化 LVM 的文件系统功能 
-14. 检验磁盘文件系统（fsck）
-15. 设置磁盘配额(quota) 
-16. 重新以可读写模式挂载系统磁盘 
-17. 更新quota（非必要） 
-18. 启动系统虚拟随机数生成器 
-19. 配置机器（非必要）
-20. 清除开机过程当中的临时文件
-21. 创建ICE目录 
-22. 启动交换分区（swap） 
-23. 将开机信息写入/var/log/dmesg文件中
 
 
-
-调用/etc/rc.d/rc文件 
+**调用/etc/rc.d/rc文件** 
 
 - 运行级别参数传入/etc/rc.d/rc这个脚本之后，由这个脚本文件按照不同的运行级别启动/etc/rc[0-6].d/目录中的相应的程序 
-
-- - /etc/rc3.d/k??开头的文件（??是数字），会按照数字顺序依次关闭 
+  - /etc/rc3.d/k??开头的文件（??是数字），会按照数字顺序依次关闭 
   - /etc/rc3.d/S??开头的文件（??是数字），会按照数字顺序依次启动
 
 
 
-#### **15.2 启动引导程序grub**
 
-##### **15.2.1 Grub配置文件**
-
-1. grub中分区表示
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/c8ee9fa12cdb41da25a41e0642984ff5/0?w=920&h=486)        
+------
 
 
 
-1. grub配置文件 
+## **15.2 启动引导程序grub**
 
-vi /boot/grub/grub.conf 
+#### **15.2.1 Grub配置文件**
 
-- default=0  默认启动第一个系统 
-- timeout=5  等待时间，默认是5秒 
-- splashimage=(hd0,0)/grub/splash.xpm.gz  这里是指定grub启动时的背景图像文件的保存位置的 
-- hiddenmenu 隐藏菜单
-- title CentOS (2.6.32-279.el6.i686)  title就是标题的意思
-- root (hd0,0)  是指启动程序的保存分区 
-- kernel /vmlinuz-2.6.32-279.el6.i686 ro root=UUID=b9a7a1a8-767f-4a87-8a2b-a535edb362c9 
+**1、grub中分区表示**
 
-rd_NO_LUKS  KEYBOARDTYPE=pc KEYTABLE=us 
+![image-20240330033044970](MD_Picture/image-20240330033044970.png)    
 
-rd_NO_MD crashkernel=auto LANG=zh_CN.UTF-8 
+**2、grub配置文件** 
 
-rd_NO_LVM rd_NO_DM rhgb quiet  
+- **vi /boot/grub/grub.conf** 
 
-定义内核加载时的选项
+  - default=0  默认启动第一个系统 
 
-- initrd /initramfs-2.6.32-279.el6.i686.img  
+  - timeout=5  等待时间，默认是5秒 
 
-指定了initramfs内存文件系统镜像文件的所在位置
+  - splashimage=(hd0,0)/grub/splash.xpm.gz  这里是指定grub启动时的背景图像文件的保存位置的 
 
+  - hiddenmenu 隐藏菜单
 
+  - title CentOS (2.6.32-279.el6.i686)  title就是标题的意思
 
-#### **15.3 系统修复模式**
+  - root (hd0,0)  是指启动程序的保存分区 
 
-1. **单用户模式**
+  - kernel /vmlinuz-2.6.32-279.el6.i686 ro root=UUID=b9a7a1a8-767f-4a87-8a2b-a535edb362c9 rd_NO_LUKS  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_MD crashkernel=auto LANG=zh_CN.UTF-8 
+
+    rd_NO_LVM rd_NO_DM rhgb quiet  定义内核加载时的选项  主要用于加载内核
+
+  - initrd /initramfs-2.6.32-279.el6.i686.img   指定了initramfs内存文件系统镜像文件的所在位置
+
+    ![image-20240330043458286](MD_Picture/image-20240330043458286.png)
 
 
 
 
-
-**单用户模式常见的错误修复** 
-
-- 遗忘root密码 
-- 修改系统默认运行级别
+------
 
 
 
-1. **光盘修复模式**
+#### **15.2.2 grub加密&字符界面分辨率**
 
-**重要系统文件丢失，导致系统无法启动** 
+[]: https://www.bilibili.com/video/BV1nW411v7Ed?p=108&amp;vd_source=88650c8acf756d4c8b3d97b06eee3587
 
+**1、grub加密**
+
+- grub-md5-crypt  # 生成加密密码串 SHA512，当然，系统的加密现在还是MD5
+
+  ![image-20240330044805349](MD_Picture/image-20240330044805349.png)
+
+​				注意在timeout 后面加入下面的内容，MD5的密码是自动生成的，记得输入密码后复制下来。
+
+**2、纯字符界面分辨率调整**
+
+![image-20240330045101191](MD_Picture/image-20240330045101191.png)
+
+​							![可调选项](MD_Picture/image-20240330045132731.png)
+
+```
+可调选项,注意有的不识别，只能识别十六进制的，注意转换
+```
+
+![image-20240330045235312](MD_Picture/image-20240330045235312.png)
+
+
+
+------
+
+
+
+## **15.3 系统修复模式**
+
+ https://www.bilibili.com/video/BV1nW411v7Ed?p=109&vd_source=88650c8acf756d4c8b3d97b06eee3587
+
+```
+开机，主要按下e键，进入编辑模式，在进入内核，kernel ，进入后按下 空格1 ，进入单用户模式，可以重设密码
+```
+
+![image-20240330045644226](MD_Picture/image-20240330045644226.png)
+
+**1、单用户模式**
+
+- **单用户模式常见的错误修复** 
+
+  - 遗忘root密码 
+
+  - 修改系统默认运行级别
+
+
+
+
+**2、光盘修复模式**
+
+- **重要系统文件丢失，导致系统无法启动** 
+
+```
 bash-4.1# chroot /mnt/sysimage 
-
-\#改变主目录 
-
+#改变主目录 
 sh-4.1# cd /root 
-
 sh-4.1# rpm -qf /etc/inittab 
-
-\#查询下/etc/inittab文件属于哪个包。 
-
+#查询下/etc/inittab文件属于哪个包。 
 sh-4.1# mkdir /mnt/cdrom 
-
-\#建立挂载点 
-
+#建立挂载点 
 sh-4.1# mount /dev/sr0 /mnt/cdrom 
-
-\#挂载光盘   
-
+#挂载光盘   
 sh-4.1#  rpm2cpio/mnt/cdrom/Packages/initscripts-8.45.3-1.i386.rpm  \
-
   | cpio -idv ./etc/inittab 
-
-\#提取inittab文件到当前目录 
-
+#提取inittab文件到当前目录 
 sh-4.1#  cp etc/inittab /etc/inittab 
+#复制inittab文件到指定位置
+```
 
-\#复制inittab文件到指定位置
 
 
+**3、Linux的安全性**   ![image-20240330033111988](MD_Picture/image-20240330033111988.png)  
 
-3、**Linux的安全性**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/14e5dcd8d057a2fca860cb8834a091be/0?w=890&h=416)        
 
 # **第十六章 备份与恢复**
 
-#### **16.1 备份概述**
+## **16.1 备份概述**
 
-1. Linux系统需要备份的数据 
+**1、Linux系统需要备份的数据** 
 
-- /root/目录： 
-- /home/目录：
-- /var/spool/mail/目录： 
-- /etc/目录： 
-- 其他目录： 
+- /root/目录： 很多重要数据
+- /home/目录： 普通用户数据
+- /var/spool/mail/目录： 邮件默认
+- /etc/目录： 配置文件
+- 其他目录： bin log ...
 
 
 
-**安装服务的数据** 
+**2、安装服务的数据** 
 
 - apache需要备份的数据 
-
-- - 配置文件 
+  - 配置文件 
   - 网页主目录 
   - 日志文件 
-  - mysql需要备份的数据
+- mysql需要备份的数据
   - 源码包安装的mysql：/usr/local/mysql/data/ 
   - RPM包安装的mysql：/var/lib/mysql/
 
 
 
-1. 备份策略 
+**2、备份策略** 
 
-- 完全备份：完全备份就是指把所有需要备份的数据全部备份，当然完全备份可以备份整块硬盘，整个分区或某个具体的目录
+- **完全备份：**完全备份就是指把所有需要备份的数据全部备份，当然完全备份可以备份整块硬盘，整个分区或某个					  具体的目录.
 
-**增量备份**
+- ​	**增量备份**:  每次备份都只备份新增的数据。
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/8d936b7c27bb0ef8122440a689153b9f/0?w=752&h=580)        
+​                 ![image-20240330033136652](MD_Picture/image-20240330033136652.png)
 
-**差异备份**
+- **差异备份：**恢复更方便而已。
 
-
-
-
-
-#### **16.2 dump和restore命令**
-
-1. dump命令 
-
-[root@localhost ~]# dump [选项] 备份之后的文件名 原文件或目录 
-
-选项：  
-
--level： 就是我们说的0-9十个备份级别  
-
--f 文件名： 指定备份之后的文件名  
-
--u：  备份成功之后，把备份时间记录在/etc/dumpdates文件  
-
--v：  显示备份过程中更多的输出信息  
-
--j：  调用bzlib库压缩备份文件，其实就是把备份文件压缩  为.bz2格式，默认压缩等级是2  
-
--W： 显示允许被dump的分区的备份等级及备份时间  
+  ![image-20240330034852693](MD_Picture/image-20240330034852693.png)
 
 
 
-备份分区 
-
-dump -0uj -f /root/boot.bak.bz2 /boot/ 
-
-\#备份命令。先执行一次完全备份，并压缩和更新备份时间 
-
-cat /etc/dumpdates 
-
-\#查看备份时间文件 
-
-cp install.log /boot/ 
-
-\#复制日志文件到/boot分区 
-
-dump -1uj -f /root/boot.bak1.bz2 /boot/ 
-
-\#增量备份/boot分区，并压缩 
-
-dump –W 
-
-\#查询分区的备份时间及备份级别的
+------
 
 
 
-备份文件或目录
-
-dump -0j -f /root/etc.dump.bz2 /etc/
-
-\#完全备份/etc/目录，只能使用0级别进行完全备份，而不再支持增量备份  
+## **16.2 dump和restore命令**
 
 
 
-1. restore命令 
+**1、dump命令** 
 
-[root@localhost ~]# restore [模式选项] [选项]  
+[root@localhost ~]# **dump [选项] 备份之后的文件名 原文件或目录** 
 
-模式选项：restore命令常用的模式有以下四种，这四个模式不能混用。 
+**选项：**  
 
-```
-    -C：比较备份数据和实际数据的变化  
-```
+- -level： 就是我们说的0-9十个备份级别  
 
--i： 进入交互模式，手工选择需要恢复的文件。 
+- -f 文件名： 指定备份之后的文件名  
 
-```
-    -t： 查看模式，用于查看备份文件中拥有哪些数据。 
-```
+- -u：  备份成功之后，把备份时间记录在/etc/dumpdates文件  
 
-​             -r： 还原模式，用于数据还原。 
+- -v：  显示备份过程中更多的输出信息  
 
-选项： 
+- -j：  调用bzlib库压缩备份文件，其实就是把备份文件压缩  为.bz2格式，默认压缩等级是2  
 
--f： 指定备份文件的文件名
+- -W： 显示允许被dump的分区的备份等级及备份时间  
+
+  
+
+> **备份分区** 
+>
+> ​		**dump -0uj -f /root/boot.bak.bz2 /boot/** 
+>
+> ​				#备份命令。先执行一次完全备份，并压缩和更新备份时间 
+>
+> ​		**cat /etc/dumpdates** 
+>
+> ​				 #查看备份时间文件 
+>
+> ​			**cp install.log /boot/** 
+>
+> \#复制日志文件到/boot分区 
+>
+> ​			**dump -1uj -f /root/boot.bak1.bz2 /boot/** 
+>
+> \#增量备份/boot分区，并压缩 
+>
+> ​			**dump –W** 
+>
+> \#查询分区的备份时间及备份级别的
+>
+
+
+
+> **备份文件或目录**
+>
+> dump -0j -f /root/etc.dump.bz2 /etc/
+>
+> \#完全备份/etc/目录，只能使用0级别进行完全备份，而不再支持增量备份  （只有对分区才能）
+>
+
+
+
+**2、restore命令** 
+
+[root@localhost ~]# **restore [模式选项] [选项]**  
+
+- 模式选项：restore命令常用的模式有以下四种，这四个模式不能混用。 
+  -  -C：比较备份数据和实际数据的变化  
+  - -i： 进入交互模式，手工选择需要恢复的文件。 
+  - -t： 查看模式，用于查看备份文件中拥有哪些数据。 
+  - -r： 还原模式，用于数据还原。 
+
+- 选项： 
+
+  - -f： 指定备份文件的文件名
+
+    ![image-20240330040351154](MD_Picture/image-20240330040351154.png)
+
+​									![image-20240330040437129](MD_Picture/image-20240330040437129.png)
+
+![image-20240330040721407](MD_Picture/image-20240330040721407.png)
+
+![image-20240330040758101](MD_Picture/image-20240330040758101.png)
+
+
+
+------
+
+
 
 
 
@@ -5276,246 +5153,160 @@ dump -0j -f /root/etc.dump.bz2 /etc/
 
 #### **1.1 su 命令报错**
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/4c4898a8b213d8ea823ced1d511e0afe/0?w=538&h=134)        
+​                ![image-20240330033205148](MD_Picture/image-20240330033205148.png)        
 
-或者提示 su: Permission denied
+> 或者提示 su: Permission denied
+>
+> 原因：解开了/etc/pam.d/su中的      auth   required  pam_wheel.so use_uid  行注释
+>
 
-原因：解开了/etc/pam.d/su中的
+​               ![image-20240330033233792](MD_Picture/image-20240330033233792.png)          
 
-auth   required  pam_wheel.so use_uid  行注释
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/619066acec8019c01af79e0e52965edf/0?w=1054&h=466)        
-
-解决方法：
-
-1. 注释本行
-2. 将需要的用户加入到wheel组
-3. 命令：
-
-```
-usermod -G wheel username
-```
-
-
+> **解决方法：**
+>
+> 1. 注释本行
+> 2. 将需要的用户加入到wheel组
+> 3. 命令：
+>
+> ```
+> usermod -G wheel username
+> ```
+>
 
 
 
-示例：
+**示例：**
 
 roo用户：
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/25d2689ef1b46d25d103116591291960/0?w=674&h=104)        
+​             ![image-20240330033308992](MD_Picture/image-20240330033308992.png)        
 
 zookeeper 用户：
 
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/2c6b009a7d038c5f0dabaebb4fe3c5dc/0?w=1080&h=422)        
+​             ![image-20240330033330731](MD_Picture/image-20240330033330731.png)      
 
 tips：箭头前面，root用户进行usermod -G wheel username操作。
 
-
-
 将用户移出用户组：
-
-
-
-
 
 ```
 gpasswd -d userName groupName
 ```
 
+![image-20240330033350786](MD_Picture/image-20240330033350786.png)
 
-
-
-
-​                 ![img](https://qqadapt.qpic.cn/txdocpic/0/e5da584be9f78e9abf0bd2b05527c060/0?w=950&h=226)        
-
-
+​        
 
 #### **1.2 连接sftp服务器命令**
 
-linux sftp远程连接命令
 
 
+> **linux sftp远程连接命令**
+>
+> ```
+> sftp -oPort=60001 root@192.168.0.254
+> 
+>  　　使用-o选项来指定端口号。
+> 
+> 　　-oPort=远程端口号
+> ```
+>
+> ```
+> sftp> get /var/www/fuyatao/index.php /home/fuyatao/
+> 
+> 这条语句将从远程主机的 /var/www/fuyatao/目录下将 index.php 下载到本地 /home/fuyatao/目录下。
+> ```
+>
+> ```
+> sftp> put /home/fuyatao/downloads/Linuxgl.pdf /var/www/fuyatao/
+> 
+> 　这条语句将把本地 /home/fuyatao/downloads/目录下的 linuxgl.pdf文件上传至远程主机/var/www/fuyatao/ 目录下
+> ```
+>
 
 
-
-```
-sftp -oPort=60001 root@192.168.0.254
-```
-
-
-
-
-
- 　　使用-o选项来指定端口号。
-
-　　-oPort=远程端口号
-
-
-
-```
-sftp> get /var/www/fuyatao/index.php /home/fuyatao/
-```
-
-
-
-
-
-这条语句将从远程主机的 /var/www/fuyatao/目录下将 index.php
-
-　　下载到本地 /home/fuyatao/目录下。
-
-
-
-
-
-```
-sftp> put /home/fuyatao/downloads/Linuxgl.pdf /var/www/fuyatao/
-```
-
-
-
-
-
-　　这条语句将把本地 /home/fuyatao/downloads/目录下的 linuxgl.pdf文件上传至远程主机/var/www/fuyatao/ 目录下
 
 #### **1.3 Linux下Shell日期的格式**
 
-**常用的时间域如下：**
 
 
-
-```
-% Y 年（例如：1970，2018等） 
-% m 月（01..12）
-% d 一个月的第几天（01..31）
-% H 小时（00..23）
-% M 分（00..59）
-% S 秒（00..59）
-```
-
-
-
-
-
-
-
-**使用不带参数的date命令获取当前时间日期。这样得到的一般是CST标准格式的时间。**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date
-Sat Nov  3 22:01:57 CST 2018
-```
-
-
-
-
-
-**获取特定以特定格式，命令为：date + ‘format’，注意这里大小写敏感。**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date +'%Y-%m-%d'
-2018-11-03
-[alvin@VM_0_16_centos ~]$ date +'%Y/%m/%d %H:%M:%S'
-2018/11/03 22:08:14
-```
-
-
-
-
-
-**获取昨天的日期。可在上述的命令里再加上-d选项。**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d 'yesterday' +'%Y/%m/%d %H:%M:%S'
-2018/11/02 22:24:31
-或者
-[alvin@VM_0_16_centos ~]$ date -d 'today -1 day' +'%Y-%m-%d'
-2018-11-04
-```
-
-
-
-
-
-
-
-**获取当前时间的前一个小时**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d 'today -1 hour' +'%Y%m%d%H'
-2018110414
-或者
-[alvin@VM_0_16_centos ~]$ date +'%Y-%m-%d %H:%M:%S' -d '-1 hours'
-2018-11-04 14:43:38
-```
-
-
-
-
-
-
-
-**获取指定日期前一天。这其实就是求相对时间。比如下面求国庆的前一天日期：**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d '20181001 -1 day' +'%Y%m%d'
-20180930
-```
-
-
-
-
-
-
-
-**将日期转换为时间戳时间戳**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d "Nov  4 15:49:41 CST 2018" +%s
-1541317781
-```
-
-
-
-
-
-**将时间戳转换回日期**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d @1541317781
-Sun Nov  4 15:49:41 CST 2018
-```
-
-
-
-
-
-**将时间戳转换为日期，并按特定格式显示**
-
-
-
-```
-[alvin@VM_0_16_centos ~]$ date -d @1541317781 +'%Y%m%d %H:%M:%S'
-20181104 15:49:41
-```
-
-
+> **常用的时间域如下：**
+>
+> ```
+> % Y 年（例如：1970，2018等） 
+> % m 月（01..12）
+> % d 一个月的第几天（01..31）
+> % H 小时（00..23）
+> % M 分（00..59）
+> % S 秒（00..59）
+> ```
+>
+> **使用不带参数的date命令获取当前时间日期。这样得到的一般是CST标准格式的时间。**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date
+> Sat Nov  3 22:01:57 CST 2018
+> ```
+>
+> **获取特定以特定格式，命令为：date + ‘format’，注意这里大小写敏感。**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date +'%Y-%m-%d'
+> 2018-11-03
+> [alvin@VM_0_16_centos ~]$ date +'%Y/%m/%d %H:%M:%S'
+> 2018/11/03 22:08:14
+> ```
+>
+> **获取昨天的日期。可在上述的命令里再加上-d选项。**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d 'yesterday' +'%Y/%m/%d %H:%M:%S'
+> 2018/11/02 22:24:31
+> 或者
+> [alvin@VM_0_16_centos ~]$ date -d 'today -1 day' +'%Y-%m-%d'
+> 2018-11-04
+> ```
+>
+> **获取当前时间的前一个小时**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d 'today -1 hour' +'%Y%m%d%H'
+> 2018110414
+> 或者
+> [alvin@VM_0_16_centos ~]$ date +'%Y-%m-%d %H:%M:%S' -d '-1 hours'
+> 2018-11-04 14:43:38
+> ```
+>
+> **获取指定日期前一天。这其实就是求相对时间。比如下面求国庆的前一天日期：**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d '20181001 -1 day' +'%Y%m%d'
+> 20180930
+> ```
+>
+> **将日期转换为时间戳时间戳**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d "Nov  4 15:49:41 CST 2018" +%s
+> 1541317781
+> ```
+>
+> **将时间戳转换回日期**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d @1541317781
+> Sun Nov  4 15:49:41 CST 2018
+> ```
+>
+> **将时间戳转换为日期，并按特定格式显示**
+>
+> ```
+> [alvin@VM_0_16_centos ~]$ date -d @1541317781 +'%Y%m%d %H:%M:%S'
+> 20181104 15:49:41
+> ```
+>
+> 
+>
 
 
 
@@ -5534,8 +5325,6 @@ https://www.cnblogs.com/luchuangao/p/7795293.html
 ##### **前提条件**
 
 知道要查询的进程pid，可以通过
-
-
 
 ```
 ps -ef |grep xxx
