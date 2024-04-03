@@ -215,9 +215,9 @@ windows和Linux之间进行文档的拷贝，登录同上方法。
 >
 > ​		每个文件都有一个id号码，怎么查看呢？就利用  ls -i
 
-![image-20231124000111799](MD_Picture/ls命令2.png)
+![image-20231124000111799](MD_Picture/image-20231124000111799.png)
 
-![image-20231124000714420](MD_Picture/ls的文件类型.png)
+![image-20231124000714420](MD_Picture/image-20231124000714420.png)
 
 ## **mkdir**
 
